@@ -1,0 +1,60 @@
+[tool.poetry]
+name = "ruyi-backend"
+version = "0.0.0"
+description = "Backend service for RuyiSDK"
+keywords = ["ruyi", "ruyisdk"]
+# license = { file = "LICENSE-Apache.txt" }
+license = "Apache-2.0"
+readme = "README.md"
+authors = [
+  # { name = "WANG Xuerui", email = "wangxuerui@iscas.ac.cn" }
+  "WANG Xuerui <wangxuerui@iscas.ac.cn>",
+]
+include = ["ruyi/py.typed"]
+
+#requires-python = ">=3.11"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+
+[tool.black]
+target-version = ['py311']
+
+
+[tool.mypy]
+files = ["ruyi", "scripts"]
+show_error_codes = true
+strict = true
+enable_error_code = ["ignore-without-code", "redundant-expr", "truthy-bool"]
+
+# https://github.com/eyeseast/python-frontmatter/issues/112
+# https://github.com/python/mypy/issues/8545
+# have to supply the typing info until upstream releases a new version with
+# the py.typed marker included
+mypy_path = "./stubs"
+
+
+[tool.pylic]
+safe_licenses = [
+  "Apache Software License",
+  "BSD License",
+  "GPLv2 with linking exception",
+  "MIT License",
+  "Mozilla Public License 2.0 (MPL 2.0)", # needs mention in license notices
+]
+
+
+[tool.poetry.dependencies]
+python = ">=3.11"
+
+fastapi = "*"
+
+[tool.poetry.group.dev.dependencies]
+mypy = "^1.9.0"
+ruff = "^0.3.4"
+
+[tool.poetry.group.dist.dependencies]
+nuitka = "^2.0"
