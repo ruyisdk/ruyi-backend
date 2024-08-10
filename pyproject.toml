@@ -10,9 +10,9 @@ authors = [
   # { name = "WANG Xuerui", email = "wangxuerui@iscas.ac.cn" }
   "WANG Xuerui <wangxuerui@iscas.ac.cn>",
 ]
-include = ["ruyi/py.typed"]
+include = ["ruyi_backend/py.typed"]
 
-#requires-python = ">=3.11"
+#requires-python = ">=3.12"
 
 
 [build-system]
@@ -21,11 +21,11 @@ build-backend = "poetry.core.masonry.api"
 
 
 [tool.black]
-target-version = ['py311']
+target-version = ['py312']
 
 
 [tool.mypy]
-files = ["ruyi", "scripts"]
+files = ["ruyi_backend"]
 show_error_codes = true
 strict = true
 enable_error_code = ["ignore-without-code", "redundant-expr", "truthy-bool"]
@@ -48,9 +48,10 @@ safe_licenses = [
 
 
 [tool.poetry.dependencies]
-python = ">=3.11"
+python = ">=3.12,<4"  # because fastapi-health requires the "<4" part
 
-fastapi = "*"
+fastapi = { extras = ["standard"], version = "^0.112.0" }
+fastapi-health = "^0.4.0"
 
 [tool.poetry.group.dev.dependencies]
 mypy = "^1.9.0"
