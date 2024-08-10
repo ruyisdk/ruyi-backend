@@ -55,7 +55,14 @@ fastapi-health = "^0.4.0"
 
 [tool.poetry.group.dev.dependencies]
 mypy = "^1.9.0"
+pytest = "^8.2.2"
 ruff = "^0.3.4"
+
+# test deps
+httpx = "*"
 
 [tool.poetry.group.dist.dependencies]
 nuitka = "^2.0"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
