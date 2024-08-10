@@ -6,7 +6,7 @@ app = FastAPI()
 
 
 @app.get("/api-version")
-async def api_version():
+async def api_version() -> dict[str, int]:
     return {"v": 1}
 
 
