@@ -63,7 +63,7 @@ ruff = "^0.3.4"
 httpx = "*"
 
 [tool.poetry.group.dist.dependencies]
-nuitka = "^2.0"
+nuitka = "^2.4"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
