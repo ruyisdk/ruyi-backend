@@ -41,9 +41,11 @@ mypy_path = "./stubs"
 safe_licenses = [
   "Apache Software License",
   "BSD License",
-  "GPLv2 with linking exception",
+  "ISC License (ISCL)",
   "MIT License",
   "Mozilla Public License 2.0 (MPL 2.0)", # needs mention in license notices
+  "Python Software Foundation License",
+  "The Unlicense (Unlicense)",
 ]
 
 
