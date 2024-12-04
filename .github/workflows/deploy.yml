@@ -57,7 +57,7 @@ jobs:
           DOCKER_METADATA_ANNOTATIONS_LEVELS: manifest,index
       - name: Build and push
         id: push
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           context: '.'
           platforms: linux/amd64,linux/arm64  # linux/riscv64 not yet supported by the base image
