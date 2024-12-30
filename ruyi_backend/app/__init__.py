@@ -1,12 +1,8 @@
-from fastapi import FastAPI
-from fastapi_health import health
+from .root import app as app
 
-app = FastAPI()
+# register the various API endpoints
+from . import misc as misc
+from . import telemetry as telemetry
 
-
-@app.get("/api-version")
-async def api_version() -> dict[str, int]:
-    return {"v": 1}
-
-
-app.add_api_route("/health", endpoint=health([]))
+app.include_router(misc.router)
+app.include_router(telemetry.router)
