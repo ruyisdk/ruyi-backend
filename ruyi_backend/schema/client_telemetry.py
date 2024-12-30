@@ -1,12 +1,16 @@
-from typing import NotRequired, TypeAlias, TypedDict
+from typing import TypeAlias
+from uuid import UUID
 
-## Start of copied code from ruyisdk/ruyi
+from pydantic import BaseModel, Field, PositiveInt
+
+
+## Start of adapted code from ruyisdk/ruyi
 ## This should stay mostly in sync with the client code
 
 
-class NodeInfo(TypedDict):
-    v: int
-    report_uuid: str
+class NodeInfo(BaseModel):
+    v: PositiveInt
+    report_uuid: UUID
 
     arch: str
     ci: str
@@ -17,10 +21,10 @@ class NodeInfo(TypedDict):
     os_release_version_id: str
     shell: str
 
-    riscv_machine: NotRequired["RISCVMachineInfo"]
+    riscv_machine: "RISCVMachineInfo" | None = Field(default=None)
 
 
-class RISCVMachineInfo(TypedDict):
+class RISCVMachineInfo(BaseModel):
     model_name: str
     cpu_count: int
     isa: str
@@ -29,20 +33,18 @@ class RISCVMachineInfo(TypedDict):
     mmu: str
 
 
-class AggregatedTelemetryEvent(TypedDict):
+class AggregatedTelemetryEvent(BaseModel):
     time_bucket: str
     kind: str
-    params: list[
-        tuple[str, str] | list[str]
-    ]  # tuple[str, str] round-trips back to list[str]
+    params: list[tuple[str, str]]
     count: int
 
 
-class UploadPayload(TypedDict):
-    fmt: int
+class UploadPayload(BaseModel):
+    fmt: PositiveInt
     nonce: str
     ruyi_version: str
-    installation: NotRequired[NodeInfo | None]
+    installation: NodeInfo | None = Field(default=None)
     events: list[AggregatedTelemetryEvent]
 
 
