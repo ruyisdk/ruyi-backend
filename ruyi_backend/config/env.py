@@ -1,4 +1,3 @@
-from functools import lru_cache
 from typing import Annotated, TypeAlias
 
 from fastapi import Depends
@@ -21,9 +20,18 @@ class EnvConfig(BaseSettings, case_sensitive=False):
     db_main: DBConfig = DBConfig()
 
 
-@lru_cache
-def get_env_settings() -> EnvConfig:
-    return EnvConfig()
+_ENV_CONFIG: EnvConfig | None = None
 
 
-DIEnvConfig: TypeAlias = Annotated[EnvConfig, Depends(get_env_settings)]
+def get_env_config() -> EnvConfig:
+    if _ENV_CONFIG is not None:
+        return _ENV_CONFIG
+    raise RuntimeError("EnvConfig not initialized")
+
+
+def init_env_config() -> None:
+    global _ENV_CONFIG
+    _ENV_CONFIG = EnvConfig()
+
+
+DIEnvConfig: TypeAlias = Annotated[EnvConfig, Depends(get_env_config)]
