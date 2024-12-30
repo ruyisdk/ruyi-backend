@@ -47,7 +47,7 @@ add_annotation org.opencontainers.image.revision "$git_commit"
 
 args=(
     --rm
-    --platform "linux/amd64,linux/arm64"  # linux/riscv64 is not yet supported
+    --platform "linux/amd64"  # linux/arm64 too slow to build, linux/riscv64 is not yet supported
     -o "$output_param"
     .
 )
