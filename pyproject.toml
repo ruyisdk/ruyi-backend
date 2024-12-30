@@ -36,6 +36,10 @@ enable_error_code = ["ignore-without-code", "redundant-expr", "truthy-bool"]
 # the py.typed marker included
 mypy_path = "./stubs"
 
+plugins = [
+  "pydantic.mypy",
+]
+
 
 [tool.pylic]
 safe_licenses = [
