@@ -63,7 +63,7 @@ pydantic-settings = "^2.7.0"
 sqlalchemy = {extras = ["aiosqlite", "asyncio", "asyncmy", "postgresql-asyncpg"], version = "^2.0.36"}
 
 [tool.poetry.group.dev.dependencies]
-mypy = "^1.9.0"
+mypy = "^1.14.1"
 pytest = "^8.2.2"
 ruff = "^0.8.1"
 
