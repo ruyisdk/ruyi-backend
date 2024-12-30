@@ -21,7 +21,7 @@ class NodeInfo(BaseModel):
     os_release_version_id: str
     shell: str
 
-    riscv_machine: "RISCVMachineInfo" | None = Field(default=None)
+    riscv_machine: "RISCVMachineInfo | None" = Field(default=None)
 
 
 class RISCVMachineInfo(BaseModel):
