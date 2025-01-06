@@ -59,7 +59,7 @@ python = ">=3.12,<4"  # because fastapi-health requires the "<4" part
 fastapi = { extras = ["standard"], version = "^0.115.0" }
 fastapi-health = "^0.4.0"
 pydantic = "^2.9.2"
-pydantic-settings = "^2.7.0"
+pydantic-settings = "^2.7.1"
 sqlalchemy = {extras = ["aiosqlite", "asyncio", "asyncmy", "postgresql-asyncpg"], version = "^2.0.36"}
 
 [tool.poetry.group.dev.dependencies]
