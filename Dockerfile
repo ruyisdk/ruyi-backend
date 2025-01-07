@@ -12,7 +12,7 @@ ENV POETRY_NO_INTERACTION=1 \
 
 WORKDIR /app
 RUN touch README.md
-COPY pyproject.toml poetry.lock ./
+COPY pyproject.toml poetry.lock LICENSE ./
 RUN --mount=type=cache,target=$POETRY_CACHE_DIR poetry install --without dev --no-root
 
 FROM python:3.13-alpine3.20
