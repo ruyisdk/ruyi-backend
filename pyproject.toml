@@ -1,23 +1,34 @@
-[tool.poetry]
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[project]
 name = "ruyi-backend"
 version = "0.0.0"
 description = "Backend service for RuyiSDK"
 keywords = ["ruyi", "ruyisdk"]
-# license = { file = "LICENSE-Apache.txt" }
-license = "Apache-2.0"
+license = { file = "LICENSE" }
 readme = "README.md"
 authors = [
-  # { name = "WANG Xuerui", email = "wangxuerui@iscas.ac.cn" }
-  "WANG Xuerui <wangxuerui@iscas.ac.cn>",
+  { name = "WANG Xuerui", email = "wangxuerui@iscas.ac.cn" },
 ]
 include = ["ruyi_backend/py.typed"]
+requires-python = ">=3.12,<4"  # because fastapi-health requires the "<4" part
+dependencies = [
+  "fastapi[standard] (>=0.115.0, <0.116.0)",
+  "fastapi-health (>=0.4.0, <0.5.0)",
+  "pydantic (>=2.9.2, <3.0.0)",
+  "pydantic-settings (>=2.7.0, <3.0.0)",
+  "sqlalchemy[aiosqlite,asyncio,asyncmy,postgresql-asyncpg] (>=2.0.36, <3.0.0)",
+]
 
-#requires-python = ">=3.12"
+[tool.poetry.group.dev.dependencies]
+mypy = "^1.14.1"
+pytest = "^8.2.2"
+ruff = "^0.8.1"
 
-
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+# test deps
+httpx = "*"
 
 
 [tool.black]
@@ -52,23 +63,6 @@ safe_licenses = [
   "The Unlicense (Unlicense)",
 ]
 
-
-[tool.poetry.dependencies]
-python = ">=3.12,<4"  # because fastapi-health requires the "<4" part
-
-fastapi = { extras = ["standard"], version = "^0.115.0" }
-fastapi-health = "^0.4.0"
-pydantic = "^2.9.2"
-pydantic-settings = "^2.7.0"
-sqlalchemy = {extras = ["aiosqlite", "asyncio", "asyncmy", "postgresql-asyncpg"], version = "^2.0.36"}
-
-[tool.poetry.group.dev.dependencies]
-mypy = "^1.14.1"
-pytest = "^8.2.2"
-ruff = "^0.8.1"
-
-# test deps
-httpx = "*"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
