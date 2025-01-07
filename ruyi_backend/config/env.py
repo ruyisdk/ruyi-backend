@@ -24,10 +24,10 @@ _ENV_CONFIG: EnvConfig | None = None
 
 
 def get_env_config() -> EnvConfig:
-    if _ENV_CONFIG is not None:
+    if _ENV_CONFIG is None:
         init_env_config()
-        return _ENV_CONFIG
-    raise RuntimeError("EnvConfig not initialized")
+        assert _ENV_CONFIG is not None
+    return _ENV_CONFIG
 
 
 def init_env_config() -> None:
