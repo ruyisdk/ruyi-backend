@@ -12,6 +12,11 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     init_env_config()
     cfg = get_env_config()
     init_main_db(cfg)
+    app.debug = cfg.debug
+    if not cfg.debug:
+        app.docs_url = None
+        app.redoc_url = None
+        app.openapi_url = None
 
     yield
 

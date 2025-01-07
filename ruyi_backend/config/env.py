@@ -25,13 +25,15 @@ _ENV_CONFIG: EnvConfig | None = None
 
 def get_env_config() -> EnvConfig:
     if _ENV_CONFIG is not None:
+        init_env_config()
         return _ENV_CONFIG
     raise RuntimeError("EnvConfig not initialized")
 
 
 def init_env_config() -> None:
     global _ENV_CONFIG
-    _ENV_CONFIG = EnvConfig()
+    if _ENV_CONFIG is None:
+        _ENV_CONFIG = EnvConfig()
 
 
 DIEnvConfig: TypeAlias = Annotated[EnvConfig, Depends(get_env_config)]
