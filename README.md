@@ -24,6 +24,11 @@ RUYI_BACKEND_DEBUG=true
 RUYI_BACKEND_DB_MAIN__DSN=""
 # Database name for ruyi-backend
 RUYI_BACKEND_DB_MAIN__NAME=ruyisdk
+
+# In-house server-side analytics Elasticsearch host
+RUYI_BACKEND_ES_MAIN__HOST="https://foo.example.com/bar/"
+# Authentication parameters
+RUYI_BACKEND_ES_MAIN__BASIC_AUTH="user:pass"
 ```
 
 Variable names are case-insensitive.

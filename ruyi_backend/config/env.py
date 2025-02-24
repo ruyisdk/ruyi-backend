@@ -6,11 +6,22 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class DBConfig(BaseModel):
+    """Configuration for a SQLAlchemy DB connection."""
+
     dsn: str = ""
     name: str = "ruyisdk"
 
 
+class ESConfig(BaseModel):
+    """Configuration for an Elasticsearch connection."""
+
+    host: str = ""
+    basic_auth: str = ""
+
+
 class EnvConfig(BaseSettings, case_sensitive=False):
+    """Environment config for the backend service."""
+
     model_config = SettingsConfigDict(
         env_prefix="RUYI_BACKEND_",
         env_nested_delimiter="__",
@@ -18,6 +29,7 @@ class EnvConfig(BaseSettings, case_sensitive=False):
     )
     debug: bool = False
     db_main: DBConfig = DBConfig()
+    es_main: ESConfig = ESConfig()
 
 
 _ENV_CONFIG: EnvConfig | None = None
