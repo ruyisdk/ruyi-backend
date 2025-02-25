@@ -1,3 +1,7 @@
+import datetime
+from typing import TypedDict
+import uuid
+
 from sqlalchemy import (
     Table,
     Column,
@@ -13,7 +17,18 @@ from sqlalchemy import (
 )
 from sqlalchemy.sql import func
 
+from ..schema.client_telemetry import AggregatedTelemetryEvent, NodeInfo
+
 metadata = MetaData()
+
+
+class ModelTelemetryRawUpload(TypedDict):
+    id: int
+    nonce: uuid.UUID
+    raw_events: list[AggregatedTelemetryEvent]
+    created_at: datetime.datetime
+    is_processed: bool
+
 
 telemetry_raw_uploads = Table(
     "telemetry_raw_uploads",
@@ -27,6 +42,13 @@ telemetry_raw_uploads = Table(
     Column("is_processed", BOOLEAN(), nullable=False, default=False),
 )
 
+
+class ModelTelemetryRuyiVersion(TypedDict):
+    id: int
+    version: str
+    created_at: datetime.datetime
+
+
 telemetry_ruyi_versions = Table(
     "telemetry_ruyi_versions",
     metadata,
@@ -36,6 +58,14 @@ telemetry_ruyi_versions = Table(
         "created_at", TIMESTAMP(timezone=False), server_default=func.current_timestamp()
     ),
 )
+
+
+class ModelTelemetryRawInstallationInfo(TypedDict):
+    id: int
+    report_uuid: uuid.UUID
+    raw: NodeInfo
+    created_at: datetime.datetime
+
 
 telemetry_raw_installation_infos = Table(
     "telemetry_raw_installation_infos",
@@ -47,6 +77,21 @@ telemetry_raw_installation_infos = Table(
         "created_at", TIMESTAMP(timezone=False), server_default=func.current_timestamp()
     ),
 )
+
+
+class ModelTelemetryInstallationInfo(TypedDict):
+    id: int
+    report_uuid: uuid.UUID
+    arch: str
+    ci: str
+    libc_name: str
+    libc_ver: str
+    os: str
+    os_release_id: str
+    os_release_version_id: str
+    shell: str
+    created_at: datetime.datetime
+
 
 telemetry_installation_infos = Table(
     "telemetry_installation_infos",
@@ -66,6 +111,18 @@ telemetry_installation_infos = Table(
     ),
 )
 
+
+class ModelTelemetryRISCVMachineInfo(TypedDict):
+    id: int
+    model_name: str
+    cpu_count: int
+    isa: str
+    uarch: str
+    uarch_csr: str
+    mmu: str
+    created_at: datetime.datetime
+
+
 telemetry_riscv_machine_infos = Table(
     "telemetry_riscv_machine_infos",
     metadata,
@@ -80,6 +137,16 @@ telemetry_riscv_machine_infos = Table(
         "created_at", TIMESTAMP(timezone=False), server_default=func.current_timestamp()
     ),
 )
+
+
+class ModelTelemetryAggregatedEvent(TypedDict):
+    id: int
+    time_bucket: str
+    kind: str
+    params_kv_raw: list[list[str] | tuple[str, str]]
+    count: int
+    created_at: datetime.datetime
+
 
 telemetry_aggregated_events = Table(
     "telemetry_aggregated_events",
