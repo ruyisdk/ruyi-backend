@@ -1,5 +1,5 @@
 import datetime
-from typing import TypedDict
+from typing import NotRequired, Sequence, TypedDict
 import uuid
 
 from sqlalchemy import (
@@ -23,10 +23,10 @@ metadata = MetaData()
 
 
 class ModelTelemetryRawUpload(TypedDict):
-    id: int
+    id: NotRequired[int]
     nonce: uuid.UUID
-    raw_events: list[AggregatedTelemetryEvent]
-    created_at: datetime.datetime
+    raw_events: Sequence[AggregatedTelemetryEvent]
+    created_at: NotRequired[datetime.datetime]
     is_processed: bool
 
 
@@ -44,9 +44,9 @@ telemetry_raw_uploads = Table(
 
 
 class ModelTelemetryRuyiVersion(TypedDict):
-    id: int
+    id: NotRequired[int]
     version: str
-    created_at: datetime.datetime
+    created_at: NotRequired[datetime.datetime]
 
 
 telemetry_ruyi_versions = Table(
@@ -61,10 +61,10 @@ telemetry_ruyi_versions = Table(
 
 
 class ModelTelemetryRawInstallationInfo(TypedDict):
-    id: int
+    id: NotRequired[int]
     report_uuid: uuid.UUID
     raw: NodeInfo
-    created_at: datetime.datetime
+    created_at: NotRequired[datetime.datetime]
 
 
 telemetry_raw_installation_infos = Table(
@@ -80,7 +80,7 @@ telemetry_raw_installation_infos = Table(
 
 
 class ModelTelemetryInstallationInfo(TypedDict):
-    id: int
+    id: NotRequired[int]
     report_uuid: uuid.UUID
     arch: str
     ci: str
@@ -90,7 +90,7 @@ class ModelTelemetryInstallationInfo(TypedDict):
     os_release_id: str
     os_release_version_id: str
     shell: str
-    created_at: datetime.datetime
+    created_at: NotRequired[datetime.datetime]
 
 
 telemetry_installation_infos = Table(
@@ -113,14 +113,14 @@ telemetry_installation_infos = Table(
 
 
 class ModelTelemetryRISCVMachineInfo(TypedDict):
-    id: int
+    id: NotRequired[int]
     model_name: str
     cpu_count: int
     isa: str
     uarch: str
     uarch_csr: str
     mmu: str
-    created_at: datetime.datetime
+    created_at: NotRequired[datetime.datetime]
 
 
 telemetry_riscv_machine_infos = Table(
@@ -140,12 +140,12 @@ telemetry_riscv_machine_infos = Table(
 
 
 class ModelTelemetryAggregatedEvent(TypedDict):
-    id: int
+    id: NotRequired[int]
     time_bucket: str
     kind: str
-    params_kv_raw: list[list[str] | tuple[str, str]]
+    params_kv_raw: Sequence[list[str] | tuple[str, str]]
     count: int
-    created_at: datetime.datetime
+    created_at: NotRequired[datetime.datetime]
 
 
 telemetry_aggregated_events = Table(
