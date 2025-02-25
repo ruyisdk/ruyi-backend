@@ -1,6 +1,10 @@
 # ruyi-backend
 
-Server-side components of RuyiSDK
+Server-side components of RuyiSDK.
+
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/ruyisdk/ruyi-backend/ci.yml)
+![GitHub License](https://img.shields.io/github/license/ruyisdk/ruyi-backend)
+![Python Version](https://img.shields.io/badge/python-%3E%3D3.12-blue)
 
 ## Config
 
