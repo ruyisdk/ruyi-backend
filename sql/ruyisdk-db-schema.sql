@@ -3,8 +3,9 @@ CREATE TABLE `telemetry_raw_uploads` (
     `nonce` UUID NOT NULL COMMENT 'Nonce for server-side event de-duping',
     `raw_events` JSON COMMENT 'The raw JSON payload',
     `created_at` TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
+    `is_processed` BOOLEAN NOT NULL DEFAULT FALSE COMMENT 'Whether this row has been processed',
     UNIQUE KEY `idx_telemetry_raw_uploads_nonce` (`nonce`),
-    KEY `idx_telemetry_raw_uploads_ctime` (`created_at`)
+    KEY `idx_telemetry_raw_uploads_ctime_processed` (`created_at`, `is_processed`)
 ) ENGINE InnoDB CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 CREATE TABLE `telemetry_ruyi_versions` (

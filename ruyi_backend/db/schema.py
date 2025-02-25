@@ -3,6 +3,7 @@ from sqlalchemy import (
     Column,
     MetaData,
     BIGINT,
+    BOOLEAN,
     TIMESTAMP,
     VARCHAR,
     JSON,
@@ -23,6 +24,7 @@ telemetry_raw_uploads = Table(
     Column(
         "created_at", TIMESTAMP(timezone=False), server_default=func.current_timestamp()
     ),
+    Column("is_processed", BOOLEAN(), nullable=False, default=False),
 )
 
 telemetry_ruyi_versions = Table(
