@@ -19,6 +19,12 @@ class ESConfig(BaseModel):
     basic_auth: str = ""
 
 
+class HTTPConfig(BaseModel):
+    """Configuration for an HTTP client."""
+
+    cors_origins: list[str] = ["*"]
+
+
 class EnvConfig(BaseSettings, case_sensitive=False):
     """Environment config for the backend service."""
 
@@ -30,6 +36,7 @@ class EnvConfig(BaseSettings, case_sensitive=False):
     debug: bool = False
     db_main: DBConfig = DBConfig()
     es_main: ESConfig = ESConfig()
+    http: HTTPConfig = HTTPConfig()
 
 
 _ENV_CONFIG: EnvConfig | None = None

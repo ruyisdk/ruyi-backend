@@ -33,6 +33,10 @@ RUYI_BACKEND_DB_MAIN__NAME=ruyisdk
 RUYI_BACKEND_ES_MAIN__HOST="https://foo.example.com/bar/"
 # Authentication parameters
 RUYI_BACKEND_ES_MAIN__BASIC_AUTH="user:pass"
+
+# JSON-encoded list of allowed CORS origins.
+# Empty value is treated as ["*"].
+RUYI_BACKEND_HTTP__CORS_ORIGINS='["https://ruyisdk.org"]'
 ```
 
 Variable names are case-insensitive.
