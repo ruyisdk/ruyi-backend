@@ -1,11 +1,9 @@
-import asyncio
-
 from fastapi import APIRouter
 
 from ..components.frontend_dashboard_processor import crunch_dashboard_numbers
 from ..db.conn import DIMainDB
 from ..es import DIMainES
-from ..schema.frontend import DashboardDataV1, DashboardEventDetailV1
+from ..schema.frontend import DashboardDataV1
 
 router = APIRouter()
 
