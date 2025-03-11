@@ -26,7 +26,8 @@ async def crunch_dashboard_numbers(
         query={
             "bool": {
                 "must": [
-                    {"wildcard": {"url.path": {"value": "/ruyisdk/*"}}},
+                    # only /ruyisdk/ruyi/ paths correspond to the RuyiSDK PM
+                    {"wildcard": {"url.path": {"value": "/ruyisdk/ruyi/*"}}},
                     {
                         "range": {
                             "@timestamp": {
