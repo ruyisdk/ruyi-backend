@@ -21,6 +21,7 @@ dependencies = [
   "pydantic-settings (>=2.7.0, <3.0.0)",
   "sqlalchemy[aiosqlite,asyncio,asyncmy,postgresql-asyncpg] (>=2.0.36, <3.0.0)",
   "elasticsearch[async] (>=8.17.1,<9.0.0)",
+  "redis[hiredis] (>=5.2.1,<6.0.0)",
 ]
 
 [tool.poetry.group.dev.dependencies]
