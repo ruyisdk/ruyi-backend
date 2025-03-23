@@ -25,6 +25,12 @@ class HTTPConfig(BaseModel):
     cors_origins: list[str] = ["*"]
 
 
+class RedisConfig(BaseModel):
+    """Configuration for a Redis connection."""
+
+    host: str = ""
+
+
 class EnvConfig(BaseSettings, case_sensitive=False):
     """Environment config for the backend service."""
 
@@ -34,6 +40,7 @@ class EnvConfig(BaseSettings, case_sensitive=False):
         nested_model_default_partial_update=True,
     )
     debug: bool = False
+    cache_main: RedisConfig = RedisConfig()
     db_main: DBConfig = DBConfig()
     es_main: ESConfig = ESConfig()
     http: HTTPConfig = HTTPConfig()

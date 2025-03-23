@@ -20,6 +20,9 @@ and respective defaults:
 # Debugging flag
 RUYI_BACKEND_DEBUG=true
 
+# Main Redis connection
+RUYI_BACKEND_CACHE_MAIN__HOST="redis://:password@localhost:6379/0?protocol=3"
+
 #
 # Main database connection
 #
