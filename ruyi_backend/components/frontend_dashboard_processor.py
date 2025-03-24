@@ -4,6 +4,8 @@ from elasticsearch import AsyncElasticsearch
 from sqlalchemy.ext.asyncio import AsyncConnection
 from sqlalchemy.sql.expression import func, select
 
+from ..cache import KEY_TELEMETRY_DATA_LAST_PROCESSED
+from ..cache.store import CacheStore
 from ..db.schema import (
     telemetry_aggregated_events,
     telemetry_installation_infos,
@@ -14,11 +16,21 @@ from ..schema.frontend import DashboardDataV1, DashboardEventDetailV1
 async def crunch_dashboard_numbers(
     db: AsyncConnection,
     es: AsyncElasticsearch,
+    cache: CacheStore,
 ) -> DashboardDataV1:
     """
     Ingests the semi-processed telemetry events to produce statistics for the
     RuyiSDK website dashboard.
     """
+
+    try:
+        last_updated = await cache.get(KEY_TELEMETRY_DATA_LAST_PROCESSED)
+        if not isinstance(last_updated, datetime.datetime):
+            # malformed cache entry
+            raise ValueError()
+    except Exception:
+        # graceful degrade to something sensible
+        last_updated = datetime.datetime.now(datetime.timezone.utc)
 
     # query download counts from ES
     now = datetime.datetime.now(tz=datetime.timezone.utc)
@@ -81,6 +93,7 @@ async def crunch_dashboard_numbers(
     }
 
     return DashboardDataV1(
+        last_updated=last_updated,
         downloads=DashboardEventDetailV1(total=download_count),
         installs=DashboardEventDetailV1(total=installation_count),
         top_packages={},  # TODO: numbers are not reported yet

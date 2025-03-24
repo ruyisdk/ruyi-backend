@@ -43,3 +43,7 @@ DIMainRedis: TypeAlias = Annotated[Redis, Depends(get_main_redis)]
 
 DICacheStore: TypeAlias = Annotated[CacheStore, Depends(get_cache_store)]
 """Dependency on the application cache store."""
+
+# Keys.
+KEY_TELEMETRY_DATA_LAST_PROCESSED = "telemetry:last-processed"
+"""Last processed time of raw telemetry data."""

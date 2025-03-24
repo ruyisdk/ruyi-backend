@@ -1,7 +1,10 @@
+import datetime
+
 from fastapi import APIRouter
 from sqlalchemy.sql.expression import select
 from sqlalchemy.sql.expression import update
 
+from ..cache import DICacheStore, KEY_TELEMETRY_DATA_LAST_PROCESSED
 from ..components.telemetry_processor import process_telemetry_data
 from ..db.conn import DIMainDB
 from ..db.schema import telemetry_raw_uploads, ModelTelemetryRawUpload
@@ -15,6 +18,7 @@ router = APIRouter()
 async def admin_process_telemetry(
     req: ReqProcessTelemetry,
     main_db: DIMainDB,
+    cache: DICacheStore,
 ) -> None:
     """Processes collected raw telemetry data so far."""
 
@@ -50,3 +54,6 @@ async def admin_process_telemetry(
 
             # Commit the transaction
             await txn.commit()
+
+    last_processed = datetime.datetime.now(datetime.timezone.utc)
+    await cache.set(KEY_TELEMETRY_DATA_LAST_PROCESSED, last_processed)
