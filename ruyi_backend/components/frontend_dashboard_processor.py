@@ -1,4 +1,5 @@
 import datetime
+from typing import cast
 
 from elasticsearch import AsyncElasticsearch
 from sqlalchemy.ext.asyncio import AsyncConnection
@@ -34,25 +35,30 @@ async def crunch_dashboard_numbers(
 
     # query download counts from ES
     now = datetime.datetime.now(tz=datetime.timezone.utc)
-    download_count_resp = await es.count(
-        query={
-            "bool": {
-                "must": [
-                    # only /ruyisdk/ruyi/ paths correspond to the RuyiSDK PM
-                    {"wildcard": {"url.path": {"value": "/ruyisdk/ruyi/*"}}},
-                    {
-                        "range": {
-                            "@timestamp": {
-                                "gte": "2025-01-01T00:00:00+08:00",
-                                "lt": now.isoformat(),
+
+    async def query_es_count(path: str) -> int:
+        resp = await es.count(
+            query={
+                "bool": {
+                    "must": [
+                        {"wildcard": {"url.path": {"value": path}}},
+                        {
+                            "range": {
+                                "@timestamp": {
+                                    "gte": "2025-01-01T00:00:00+08:00",
+                                    "lt": now.isoformat(),
+                                }
                             }
-                        }
-                    },
-                ]
+                        },
+                    ]
+                }
             }
-        }
-    )
-    download_count = download_count_resp["count"]
+        )
+        return cast(int, resp["count"])
+
+    # only /ruyisdk/ruyi/ paths correspond to the RuyiSDK PM
+    pm_download_count = await query_es_count("/ruyisdk/ruyi/*")
+    pkg_download_count = await query_es_count("/ruyisdk/dist/*")
 
     # count total installations
     installation_count = await db.scalar(
@@ -94,7 +100,8 @@ async def crunch_dashboard_numbers(
 
     return DashboardDataV1(
         last_updated=last_updated,
-        downloads=DashboardEventDetailV1(total=download_count),
+        downloads=DashboardEventDetailV1(total=pkg_download_count),
+        pm_downloads=DashboardEventDetailV1(total=pm_download_count),
         installs=DashboardEventDetailV1(total=installation_count),
         top_packages={},  # TODO: numbers are not reported yet
         top_commands=top10_sorted_commands,
