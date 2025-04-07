@@ -7,7 +7,8 @@ name = "ruyi-backend"
 version = "0.0.0"
 description = "Backend service for RuyiSDK"
 keywords = ["ruyi", "ruyisdk"]
-license = { file = "LICENSE" }
+license = "Apache-2.0"
+license_files = ["LICENSE"]
 readme = "README.md"
 authors = [
   { name = "WANG Xuerui", email = "wangxuerui@iscas.ac.cn" },
@@ -58,11 +59,16 @@ plugins = [
 
 [tool.pylic]
 safe_licenses = [
+  "Apache-2.0",
   "Apache Software License",
+  "BSD-2-Clause",
+  "BSD-3-Clause",
   "BSD License",
   "ISC License (ISCL)",
+  "MIT",
   "MIT License",
   "Mozilla Public License 2.0 (MPL 2.0)", # needs mention in license notices
+  "PSF-2.0",
   "Python Software Foundation License",
   "The Unlicense (Unlicense)",
 ]
