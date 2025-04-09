@@ -78,9 +78,9 @@ async def process_telemetry_data(
 
     if installation_infos_buffer:
         await conn.execute(
-            insert(telemetry_installation_infos).values(
-                list(installation_infos_buffer.values())
-            )
+            insert(telemetry_installation_infos)
+            .values(list(installation_infos_buffer.values()))
+            .prefix_with("IGNORE")
         )
 
     if riscv_machine_infos_buffer:
