@@ -37,3 +37,23 @@ some kind of proxy and/or port forwarding. This is out of scope of this document
 There are also some convenience facilities provided for easier debugging:
 
 * `scripts/ruyi-backend-mysql-main`: equivalent to `mariadb` or `mysql` (in that order) with the DSN configured in the environment.
+
+## Contributing
+
+We welcome contributions to Ruyi! Please see our [contribution guidelines](./CONTRIBUTING.md) ([中文](./CONTRIBUTING.zh.md)) for details on how to get started.
+
+## License
+
+Copyright &copy; 2024-2025 Institute of Software, Chinese Academy of Sciences (ISCAS).
+All rights reserved.
+
+`ruyi-backend` is licensed under the [Apache 2.0 license](./LICENSE-Apache.txt).
+
+The default build of `ruyi-backend` contains code licensed under the
+[Mozilla Public License 2.0](https://mozilla.org/MPL/2.0/).
+You can get the respective project's sources from the project's official
+website:
+
+* [`certifi`](https://github.com/certifi/python-certifi): used unmodified
+
+All trademarks referenced herein are property of their respective holders.
