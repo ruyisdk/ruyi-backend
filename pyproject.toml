@@ -67,6 +67,7 @@ safe_licenses = [
   "ISC License (ISCL)",
   "MIT",
   "MIT License",
+  "MIT AND Python-2.0",  # greenlet 3.2.0
   "Mozilla Public License 2.0 (MPL 2.0)", # needs mention in license notices
   "PSF-2.0",
   "Python Software Foundation License",
