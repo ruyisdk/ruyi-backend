@@ -121,7 +121,7 @@ async def crunch_and_cache_dashboard_numbers(
 
     # cache the result
     try:
-        await cache.set(KEY_FRONTEND_DASHBOARD, result)
+        await cache.set(KEY_FRONTEND_DASHBOARD, result.model_dump())
     except Exception:
         # ignore cache errors
         pass
