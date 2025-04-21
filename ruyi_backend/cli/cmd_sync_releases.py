@@ -167,32 +167,34 @@ class ReleaseSyncer:
         self.logger.info("rsync staging directory at %s", self.state_store.local_dir)
 
         releases = await list_releases(self.gh, GITHUB_OWNER_REPO)
-        for gh_rel in releases:
-            name = gh_rel["tag_name"]
-            kind = "testing" if gh_rel["prerelease"] else "releases"
-            rel = Release(kind, name)
-
-            # skip previous releases that were manually managed
-            if Version.parse(name) <= Version.parse("0.6.0"):
-                self.logger.debug("%s: ignoring pre-automation releases", name)
-                continue
-
-            is_synced = await self.state_store.is_release_synced(rel)
-            synced_str = "synced" if is_synced else "needs sync"
-            self.logger.info("%s: %s %s", name, kind, synced_str)
-            if is_synced:
-                continue
-
-            rel_dir = self.state_store.get_local_release_dir(rel)
-            await rel_dir.mkdir(parents=True, exist_ok=True)
-            self.logger.info("%s: pulling assets", name)
-            await self.ensure_release_assets(rel_dir, gh_rel["assets"])
-
-            self.logger.info("%s: pushing to remote", name)
-            await self.remote.sync(rel, rel_dir)
-            await self.state_store.mark_release_synced(rel)
-
+        tasks = [self.run_one(gh_rel) for gh_rel in releases]
+        await asyncio.gather(*tasks)
         return 0
+
+    async def run_one(self, gh_rel: GitHubRelease) -> None:
+        name = gh_rel["tag_name"]
+        kind = "testing" if gh_rel["prerelease"] else "releases"
+        rel = Release(kind, name)
+
+        # skip previous releases that were manually managed
+        if Version.parse(name) <= Version.parse("0.6.0"):
+            self.logger.debug("%s: ignoring pre-automation releases", name)
+            return
+
+        is_synced = await self.state_store.is_release_synced(rel)
+        synced_str = "synced" if is_synced else "needs sync"
+        self.logger.info("%s: %s %s", name, kind, synced_str)
+        if is_synced:
+            return
+
+        rel_dir = self.state_store.get_local_release_dir(rel)
+        await rel_dir.mkdir(parents=True, exist_ok=True)
+        self.logger.info("%s: pulling assets", name)
+        await self.ensure_release_assets(rel_dir, gh_rel["assets"])
+
+        self.logger.info("%s: pushing to remote", name)
+        await self.remote.sync(rel, rel_dir)
+        await self.state_store.mark_release_synced(rel)
 
 
 async def do_sync_releases(cfg: ReleaseWorkerConfig) -> int:
