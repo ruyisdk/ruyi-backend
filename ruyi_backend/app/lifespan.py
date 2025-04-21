@@ -7,6 +7,7 @@ from ..cache import init_main_redis
 from ..config.env import get_env_config, init_env_config
 from ..db.conn import init_main_db
 from ..es import init_main_es
+from ..gh import init_github
 
 
 @asynccontextmanager
@@ -16,6 +17,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     init_main_redis(cfg)
     init_main_db(cfg)
     init_main_es(cfg)
+    init_github(cfg)
     app.debug = cfg.debug
     if not cfg.debug:
         app.docs_url = None

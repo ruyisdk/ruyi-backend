@@ -16,15 +16,16 @@ authors = [
 include = ["ruyi_backend/py.typed"]
 requires-python = ">=3.12,<4"  # because fastapi-health requires the "<4" part
 dependencies = [
-  "fastapi[standard] (>=0.115.0, <0.116.0)",
-  "fastapi-health (>=0.4.0, <0.5.0)",
-  "pydantic (>=2.9.2, <3.0.0)",
-  "pydantic-settings (>=2.7.0, <3.0.0)",
-  "sqlalchemy[aiosqlite,asyncio,asyncmy,postgresql-asyncpg] (>=2.0.36, <3.0.0)",
   "elasticsearch[async] (>=8.17.1,<9.0.0)",
-  "redis[hiredis] (>=5.2.1,<6.0.0)",
+  "fastapi-health (>=0.4.0, <0.5.0)",
+  "fastapi[standard] (>=0.115.0, <0.116.0)",
+  "githubkit (>=0.12.11,<0.13.0)",
   "msgpack (>=1.1.0,<2.0.0)",
   "msgpack-types (>=0.5.0,<0.6.0)",
+  "pydantic (>=2.9.2, <3.0.0)",
+  "pydantic-settings (>=2.7.0, <3.0.0)",
+  "redis[hiredis] (>=5.2.1,<6.0.0)",
+  "sqlalchemy[aiosqlite,asyncio,asyncmy,postgresql-asyncpg] (>=2.0.36, <3.0.0)",
 ]
 
 [tool.poetry.group.dev.dependencies]
@@ -67,6 +68,7 @@ safe_licenses = [
   "ISC License (ISCL)",
   "MIT",
   "MIT License",
+  "MIT AND Python-2.0",  # greenlet 3.2.0
   "Mozilla Public License 2.0 (MPL 2.0)", # needs mention in license notices
   "PSF-2.0",
   "Python Software Foundation License",
