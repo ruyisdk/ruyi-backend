@@ -16,6 +16,11 @@ def get_main_es() -> AsyncElasticsearch:
 
 def init_main_es(cfg: DIEnvConfig) -> None:
     global _MAIN_ES_CONN
+
+    if cfg.es_main.host == "":
+        # no Elasticsearch (maybe we're running from the CLI)
+        return
+
     username, password = cfg.es_main.basic_auth.split(":", 1)
     _MAIN_ES_CONN = AsyncElasticsearch(
         cfg.es_main.host,

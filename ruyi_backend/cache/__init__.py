@@ -26,6 +26,10 @@ def init_main_redis(cfg: DIEnvConfig) -> None:
     global _MAIN_REDIS_CONN
     global _STORE
 
+    if cfg.cache_main.host == "":
+        # no Redis (maybe we're running from the CLI)
+        return
+
     conn = Redis.from_url(cfg.cache_main.host)
 
     # we do our own (de)serialization, so force the option here, in case it is

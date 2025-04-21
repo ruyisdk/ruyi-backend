@@ -3,21 +3,14 @@ from typing import AsyncGenerator
 
 from fastapi import FastAPI
 
-from ..cache import init_main_redis
-from ..config.env import get_env_config, init_env_config
-from ..db.conn import init_main_db
-from ..es import init_main_es
-from ..gh import init_github
+from ..config import get_env_config, init
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
-    init_env_config()
+    init()
     cfg = get_env_config()
-    init_main_redis(cfg)
-    init_main_db(cfg)
-    init_main_es(cfg)
-    init_github(cfg)
+
     app.debug = cfg.debug
     if not cfg.debug:
         app.docs_url = None

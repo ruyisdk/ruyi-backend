@@ -16,6 +16,11 @@ def get_main_db() -> AsyncEngine:
 
 def init_main_db(cfg: DIEnvConfig) -> None:
     global _DB_ENGINE
+
+    if cfg.db_main.dsn == "":
+        # no DB (maybe we're running from the CLI)
+        return
+
     _DB_ENGINE = create_async_engine(cfg.db_main.dsn, echo=cfg.debug)
 
 

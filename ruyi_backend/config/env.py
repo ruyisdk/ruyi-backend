@@ -39,6 +39,20 @@ class RedisConfig(BaseModel):
     host: str = ""
 
 
+class ReleaseWorkerConfig(BaseModel):
+    """Configuration for the release worker."""
+
+    rsync_staging_dir: str = ""
+    rsync_remote_url: str = ""
+    rsync_remote_pass: str = ""
+
+
+class CLIConfig(BaseModel):
+    """Configuration for the CLI management client."""
+
+    release_worker: ReleaseWorkerConfig = ReleaseWorkerConfig()
+
+
 class EnvConfig(BaseSettings, case_sensitive=False):
     """Environment config for the backend service."""
 
@@ -49,6 +63,7 @@ class EnvConfig(BaseSettings, case_sensitive=False):
     )
     debug: bool = False
     cache_main: RedisConfig = RedisConfig()
+    cli: CLIConfig = CLIConfig()
     db_main: DBConfig = DBConfig()
     es_main: ESConfig = ESConfig()
     github: GitHubConfig = GitHubConfig()
