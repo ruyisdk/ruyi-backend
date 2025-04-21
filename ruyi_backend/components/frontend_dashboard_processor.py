@@ -5,8 +5,9 @@ from elasticsearch import AsyncElasticsearch
 from sqlalchemy.ext.asyncio import AsyncConnection
 from sqlalchemy.sql.expression import func, select
 
-from ..cache import KEY_TELEMETRY_DATA_LAST_PROCESSED
+from ..cache import KEY_GITHUB_RELEASE_STATS, KEY_TELEMETRY_DATA_LAST_PROCESSED
 from ..cache.store import CacheStore
+from ..components.github_stats import ReleaseDownloadStats, merge_download_counts
 from ..db.schema import (
     telemetry_aggregated_events,
     telemetry_installation_infos,
@@ -33,6 +34,13 @@ async def crunch_dashboard_numbers(
         # graceful degrade to something sensible
         last_updated = datetime.datetime.now(datetime.timezone.utc)
 
+    pm_gh_downloads: int
+    try:
+        gh_stats: list[ReleaseDownloadStats] = await cache.get(KEY_GITHUB_RELEASE_STATS)
+        pm_gh_downloads = merge_download_counts(gh_stats)
+    except Exception:
+        pm_gh_downloads = 0
+
     # query download counts from ES
     now = datetime.datetime.now(tz=datetime.timezone.utc)
 
@@ -57,7 +65,7 @@ async def crunch_dashboard_numbers(
         return cast(int, resp["count"])
 
     # only /ruyisdk/ruyi/ paths correspond to the RuyiSDK PM
-    pm_download_count = await query_es_count("/ruyisdk/ruyi/*")
+    pm_download_count = await query_es_count("/ruyisdk/ruyi/*") + pm_gh_downloads
     pkg_download_count = await query_es_count("/ruyisdk/dist/*")
 
     # count total installations

@@ -47,3 +47,6 @@ DICacheStore: TypeAlias = Annotated[CacheStore, Depends(get_cache_store)]
 # Keys.
 KEY_TELEMETRY_DATA_LAST_PROCESSED = "telemetry:last-processed"
 """Last processed time of raw telemetry data."""
+
+KEY_GITHUB_RELEASE_STATS = "github:release-stats"
+"""GitHub release stats data."""
