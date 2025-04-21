@@ -9,9 +9,11 @@ from ..cache import (
     KEY_GITHUB_RELEASE_STATS,
     KEY_TELEMETRY_DATA_LAST_PROCESSED,
 )
+from ..components.frontend_dashboard_processor import crunch_and_cache_dashboard_numbers
 from ..components.telemetry_processor import process_telemetry_data
 from ..db.conn import DIMainDB
 from ..db.schema import telemetry_raw_uploads, ModelTelemetryRawUpload
+from ..es import DIMainES
 from ..gh import DIGitHub
 from ..schema.admin import ReqProcessTelemetry
 from ..schema.client_telemetry import UploadPayload
@@ -24,6 +26,7 @@ router = APIRouter()
 async def admin_process_telemetry(
     req: ReqProcessTelemetry,
     main_db: DIMainDB,
+    es: DIMainES,
     cache: DICacheStore,
 ) -> None:
     """Processes collected raw telemetry data so far."""
@@ -64,10 +67,19 @@ async def admin_process_telemetry(
     last_processed = datetime.datetime.now(datetime.timezone.utc)
     await cache.set(KEY_TELEMETRY_DATA_LAST_PROCESSED, last_processed)
 
+    # refresh frontend dashboard numbers
+    try:
+        async with main_db.connect() as conn:
+            await crunch_and_cache_dashboard_numbers(conn, es, cache)
+    except Exception:
+        pass
+
 
 @router.post("/admin/refresh-github-stats-v1", status_code=204)
 async def admin_refresh_github_stats(
     cache: DICacheStore,
+    db: DIMainDB,
+    es: DIMainES,
     github: DIGitHub,
 ) -> None:
     """Refreshes the cached GitHub stats."""
@@ -77,3 +89,10 @@ async def admin_refresh_github_stats(
 
     stats = await query_release_downloads(github, project)
     await cache.set(KEY_GITHUB_RELEASE_STATS, stats)
+
+    # refresh frontend dashboard numbers
+    try:
+        async with db.connect() as conn:
+            await crunch_and_cache_dashboard_numbers(conn, es, cache)
+    except Exception:
+        pass

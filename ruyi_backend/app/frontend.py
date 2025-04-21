@@ -1,7 +1,8 @@
+from typing import cast
+
 from fastapi import APIRouter
 
-from ..cache import DICacheStore
-from ..components.frontend_dashboard_processor import crunch_dashboard_numbers
+from ..cache import DICacheStore, KEY_FRONTEND_DASHBOARD
 from ..db.conn import DIMainDB
 from ..es import DIMainES
 from ..schema.frontend import DashboardDataV1
@@ -15,9 +16,5 @@ async def get_dashboard_data_v1(
     main_es: DIMainES,
     cache: DICacheStore,
 ) -> DashboardDataV1:
-    # crunch the semi-processed numbers
-    # TODO: put these into periodic background tasks and cache the result
-    async with main_db.connect() as db:
-        x = await crunch_dashboard_numbers(db, main_es, cache)
-
-    return x
+    # only consume cached results for performance
+    return cast(DashboardDataV1, await cache.get(KEY_FRONTEND_DASHBOARD))

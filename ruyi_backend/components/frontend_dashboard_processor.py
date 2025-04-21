@@ -5,7 +5,11 @@ from elasticsearch import AsyncElasticsearch
 from sqlalchemy.ext.asyncio import AsyncConnection
 from sqlalchemy.sql.expression import func, select
 
-from ..cache import KEY_GITHUB_RELEASE_STATS, KEY_TELEMETRY_DATA_LAST_PROCESSED
+from ..cache import (
+    KEY_FRONTEND_DASHBOARD,
+    KEY_GITHUB_RELEASE_STATS,
+    KEY_TELEMETRY_DATA_LAST_PROCESSED,
+)
 from ..cache.store import CacheStore
 from ..components.github_stats import ReleaseDownloadStats, merge_download_counts
 from ..db.schema import (
@@ -15,14 +19,14 @@ from ..db.schema import (
 from ..schema.frontend import DashboardDataV1, DashboardEventDetailV1
 
 
-async def crunch_dashboard_numbers(
+async def crunch_and_cache_dashboard_numbers(
     db: AsyncConnection,
     es: AsyncElasticsearch,
     cache: CacheStore,
 ) -> DashboardDataV1:
     """
     Ingests the semi-processed telemetry events to produce statistics for the
-    RuyiSDK website dashboard.
+    RuyiSDK website dashboard, refreshing the cache.
     """
 
     try:
@@ -106,7 +110,7 @@ async def crunch_dashboard_numbers(
         for k, v in list(sorted_command_counts.items())[:10]
     }
 
-    return DashboardDataV1(
+    result = DashboardDataV1(
         last_updated=last_updated,
         downloads=DashboardEventDetailV1(total=pkg_download_count),
         pm_downloads=DashboardEventDetailV1(total=pm_download_count),
@@ -114,3 +118,12 @@ async def crunch_dashboard_numbers(
         top_packages={},  # TODO: numbers are not reported yet
         top_commands=top10_sorted_commands,
     )
+
+    # cache the result
+    try:
+        await cache.set(KEY_FRONTEND_DASHBOARD, result)
+    except Exception:
+        # ignore cache errors
+        pass
+
+    return result
