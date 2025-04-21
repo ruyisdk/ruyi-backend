@@ -9,7 +9,7 @@ Server-side components of RuyiSDK.
 ## Config
 
 It is preferred to configure `ruyi-backend` via environment variables,
-as per cloud-native best practice. See [the example `.env` file](./example.env)
+as per cloud-native best practice. See [the example `.env` file](./examples/example.env)
 for supported config keys and respective defaults.
 
 Variable names are case-insensitive.
