@@ -16,6 +16,7 @@ authors = [
 include = ["ruyi_backend/py.typed"]
 requires-python = ">=3.12,<4"  # because fastapi-health requires the "<4" part
 dependencies = [
+  "anyio (>=4.9.0,<5.0.0)",
   "elasticsearch[async] (>=8.17.1,<9.0.0)",
   "fastapi-health (>=0.4.0, <0.5.0)",
   "fastapi[standard] (>=0.115.0, <0.116.0)",
