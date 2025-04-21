@@ -19,6 +19,14 @@ class ESConfig(BaseModel):
     basic_auth: str = ""
 
 
+class GitHubConfig(BaseModel):
+    """Configuration for GitHub API access."""
+
+    api_token: str = ""
+    base_url: str = "https://api.github.com"
+    user_agent: str = "ruyisdk/ruyi-backend"
+
+
 class HTTPConfig(BaseModel):
     """Configuration for an HTTP client."""
 
@@ -43,6 +51,7 @@ class EnvConfig(BaseSettings, case_sensitive=False):
     cache_main: RedisConfig = RedisConfig()
     db_main: DBConfig = DBConfig()
     es_main: ESConfig = ESConfig()
+    github: GitHubConfig = GitHubConfig()
     http: HTTPConfig = HTTPConfig()
 
 
