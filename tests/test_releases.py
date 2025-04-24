@@ -29,15 +29,15 @@ def test_get_latest_releases(release_stats: List[ReleaseDownloadStats]) -> None:
     assert stable.download_urls == {
         "linux/aarch64": [
             "https://github.com/ruyisdk/ruyi/releases/download/0.31.0/ruyi-0.31.0.arm64",
-            "https://mirror.iscas.ac.cn/ruyisdk/ruyi/stable/0.31.0/ruyi.arm64",
+            "https://mirror.iscas.ac.cn/ruyisdk/ruyi/tags/0.31.0/ruyi-0.31.0.arm64",
         ],
         "linux/riscv64": [
             "https://github.com/ruyisdk/ruyi/releases/download/0.31.0/ruyi-0.31.0.riscv64",
-            "https://mirror.iscas.ac.cn/ruyisdk/ruyi/stable/0.31.0/ruyi.riscv64",
+            "https://mirror.iscas.ac.cn/ruyisdk/ruyi/tags/0.31.0/ruyi-0.31.0.riscv64",
         ],
         "linux/x86_64": [
             "https://github.com/ruyisdk/ruyi/releases/download/0.31.0/ruyi-0.31.0.amd64",
-            "https://mirror.iscas.ac.cn/ruyisdk/ruyi/stable/0.31.0/ruyi.amd64",
+            "https://mirror.iscas.ac.cn/ruyisdk/ruyi/tags/0.31.0/ruyi-0.31.0.amd64",
         ],
     }
 
@@ -47,14 +47,14 @@ def test_get_latest_releases(release_stats: List[ReleaseDownloadStats]) -> None:
     assert testing.download_urls == {
         "linux/aarch64": [
             "https://github.com/ruyisdk/ruyi/releases/download/0.32.0-alpha.20250409/ruyi-0.32.0-alpha.20250409.arm64",
-            "https://mirror.iscas.ac.cn/ruyisdk/ruyi/testing/0.32.0-alpha.20250409/ruyi.arm64",
+            "https://mirror.iscas.ac.cn/ruyisdk/ruyi/tags/0.32.0-alpha.20250409/ruyi-0.32.0-alpha.20250409.arm64",
         ],
         "linux/riscv64": [
             "https://github.com/ruyisdk/ruyi/releases/download/0.32.0-alpha.20250409/ruyi-0.32.0-alpha.20250409.riscv64",
-            "https://mirror.iscas.ac.cn/ruyisdk/ruyi/testing/0.32.0-alpha.20250409/ruyi.riscv64",
+            "https://mirror.iscas.ac.cn/ruyisdk/ruyi/tags/0.32.0-alpha.20250409/ruyi-0.32.0-alpha.20250409.riscv64",
         ],
         "linux/x86_64": [
             "https://github.com/ruyisdk/ruyi/releases/download/0.32.0-alpha.20250409/ruyi-0.32.0-alpha.20250409.amd64",
-            "https://mirror.iscas.ac.cn/ruyisdk/ruyi/testing/0.32.0-alpha.20250409/ruyi.amd64",
+            "https://mirror.iscas.ac.cn/ruyisdk/ruyi/tags/0.32.0-alpha.20250409/ruyi-0.32.0-alpha.20250409.amd64",
         ],
     }

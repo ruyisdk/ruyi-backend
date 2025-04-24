@@ -68,46 +68,18 @@ async def download_gh_release_asset_to(
     await local.chmod(mode)
 
 
-class Rsync:
-    def __init__(
-        self,
-        logger: logging.Logger,
-        conn_url: str,
-        password: str | None = None,
-    ) -> None:
-        # ensure the remote URL does not end with a slash, because one is
-        # to be appended at sync time
-        self.conn_url = conn_url.rstrip("/")
-        self.logger = logger
-        self.password = password
-
-    async def sync(self, rel: Release, local_dir: str | os.PathLike[Any]) -> None:
-        new_env: dict[bytes, bytes] | None = None
-        if self.password is not None:
-            new_env = os.environb.copy()
-            new_env[b"RSYNC_PASSWORD"] = self.password.encode("utf-8")
-
-        remote_spec = f"{self.conn_url}/{rel.channel}/{rel.name}/"
-        local_spec = f"{local_dir}/"
-
-        args = ("-avHPL", "--exclude=.synced", local_spec, remote_spec)
-        self.logger.info("calling rsync with args: %s", args[1:])
-        process = await asyncio.create_subprocess_exec(
-            "rsync",
-            *args,
-            env=new_env,
-        )
-        retcode = await process.wait()
-        if retcode != 0:
-            raise RuntimeError(f"rsync failed with code {retcode}")
-
-
 class RsyncStagingDir:
     def __init__(self, local_dir: str) -> None:
         self.local_dir = anyio.Path(local_dir)
 
     def get_local_release_dir(self, rel: Release) -> anyio.Path:
-        return self.local_dir / rel.channel / rel.name
+        return self.local_dir / "tags" / rel.name
+
+    def get_local_channel_dir(self, channel: str) -> anyio.Path:
+        return self.local_dir / channel
+
+    def get_local_channel_symlink(self, rel: Release) -> anyio.Path:
+        return self.get_local_channel_dir(rel.channel) / rel.name
 
     def get_marker_path_for_release(
         self,
@@ -121,6 +93,56 @@ class RsyncStagingDir:
 
     async def mark_release_synced(self, rel: Release) -> None:
         await self.get_marker_path_for_release(rel, "synced").touch()
+
+
+class Rsync:
+    def __init__(
+        self,
+        logger: logging.Logger,
+        state_store: RsyncStagingDir,
+        conn_url: str,
+        password: str | None = None,
+    ) -> None:
+        # ensure the remote URL does not end with a slash, because one is
+        # to be appended at sync time
+        self.conn_url = conn_url.rstrip("/")
+        self.logger = logger
+        self.password = password
+        self.state_store = state_store
+
+    async def _call_rsync(self, check: bool, *args: str) -> int:
+        new_env: dict[bytes, bytes] | None = None
+        if self.password is not None:
+            new_env = os.environb.copy()
+            new_env[b"RSYNC_PASSWORD"] = self.password.encode("utf-8")
+
+        self.logger.info("calling rsync with args: %s", args)
+        process = await asyncio.create_subprocess_exec(
+            "rsync",
+            *args,
+            env=new_env,
+        )
+        retcode = await process.wait()
+        if check and retcode != 0:
+            raise RuntimeError(f"rsync failed with code {retcode}")
+        return retcode
+
+    async def sync(self, rel: Release) -> None:
+        rel_dir = self.state_store.get_local_release_dir(rel)
+        channel_symlink = self.state_store.get_local_channel_symlink(rel)
+
+        remote_spec = f"{self.conn_url}/tags/{rel.name}/"
+        local_spec = f"{rel_dir}/"
+        await self._call_rsync(
+            True, "-avHPL", "--exclude=.synced", local_spec, remote_spec
+        )
+
+        # sync the channel symlink
+        channel_symlink_remote_spec = f"{self.conn_url}/{rel.channel}/{rel.name}"
+        channel_symlink_local_spec = str(channel_symlink)
+        await self._call_rsync(
+            True, "-vlptgo", channel_symlink_local_spec, channel_symlink_remote_spec
+        )
 
 
 class ReleaseSyncer:
@@ -137,8 +159,8 @@ class ReleaseSyncer:
         if not rsync_url:
             raise ValueError("rsync remote URL is not configured")
 
-        self.remote = Rsync(self.logger, rsync_url, rsync_pass)
         self.state_store = RsyncStagingDir(rsync_dir)
+        self.remote = Rsync(self.logger, self.state_store, rsync_url, rsync_pass)
 
     async def ensure_release_assets(
         self,
@@ -204,8 +226,20 @@ class ReleaseSyncer:
         self.logger.info("%s: pulling assets", name)
         await self.ensure_release_assets(rel_dir, gh_rel["assets"])
 
+        channel_symlink = self.state_store.get_local_channel_symlink(rel)
+        channel_dir = channel_symlink.parent
+        await channel_dir.mkdir(parents=True, exist_ok=True)
+        target = rel_dir.relative_to(channel_dir, walk_up=True)
+        self.logger.info(
+            "%s: adding channel symlink: %s -> %s",
+            name,
+            channel_symlink,
+            target,
+        )
+        await channel_symlink.symlink_to(target)
+
         self.logger.info("%s: pushing to remote", name)
-        await self.remote.sync(rel, rel_dir)
+        await self.remote.sync(rel)
         await self.state_store.mark_release_synced(rel)
 
 
