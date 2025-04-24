@@ -31,7 +31,7 @@ class GitHubRelease(TypedDict):
 
 
 class Release(NamedTuple):
-    kind: str
+    channel: str
     name: str
 
 
@@ -87,7 +87,7 @@ class Rsync:
             new_env = os.environb.copy()
             new_env[b"RSYNC_PASSWORD"] = self.password.encode("utf-8")
 
-        remote_spec = f"{self.conn_url}/{rel.kind}/{rel.name}/"
+        remote_spec = f"{self.conn_url}/{rel.channel}/{rel.name}/"
         local_spec = f"{local_dir}/"
 
         args = ("-avHPL", "--exclude=.synced", local_spec, remote_spec)
@@ -107,7 +107,7 @@ class RsyncStagingDir:
         self.local_dir = anyio.Path(local_dir)
 
     def get_local_release_dir(self, rel: Release) -> anyio.Path:
-        return self.local_dir / rel.kind / rel.name
+        return self.local_dir / rel.channel / rel.name
 
     def get_marker_path_for_release(
         self,
@@ -147,7 +147,7 @@ class ReleaseSyncer:
     ) -> None:
         for asset in assets:
             name = asset["name"]
-            local_file = local_dir / transform_asset_name(name)
+            local_file = local_dir / name
             self.logger.debug("asset %s: local %s", name, local_file)
             try:
                 if (await local_file.stat()).st_size == asset["size"]:
@@ -163,6 +163,14 @@ class ReleaseSyncer:
             )
             await local_file.chmod(filemode)
 
+            # make compat symlink for the onefile distribution assets
+            # previously the assets at the RuyiSDK mirror were named without
+            # the version number, but we prefer the GitHub Release asset names
+            # now so downstream doesn't need to adapt to 2 different naming
+            # conventions
+            local_file_symlink = local_dir / transform_asset_name(name)
+            await local_file_symlink.symlink_to(local_file.name)
+
     async def run(self) -> int:
         self.logger.info("rsync staging directory at %s", self.state_store.local_dir)
 
@@ -173,17 +181,21 @@ class ReleaseSyncer:
 
     async def run_one(self, gh_rel: GitHubRelease) -> None:
         name = gh_rel["tag_name"]
-        kind = "testing" if gh_rel["prerelease"] else "releases"
-        rel = Release(kind, name)
 
+        ver = Version.parse(name)
         # skip previous releases that were manually managed
-        if Version.parse(name) <= Version.parse("0.6.0"):
+        if ver <= Version.parse("0.6.0"):
             self.logger.debug("%s: ignoring pre-automation releases", name)
             return
 
+        # consider both the GitHub release metadata and the semver when determining
+        # the appropriate release channel
+        channel = "testing" if gh_rel["prerelease"] or ver.prerelease else "stable"
+        rel = Release(channel, name)
+
         is_synced = await self.state_store.is_release_synced(rel)
         synced_str = "synced" if is_synced else "needs sync"
-        self.logger.info("%s: %s %s", name, kind, synced_str)
+        self.logger.info("%s: %s %s", name, channel, synced_str)
         if is_synced:
             return
 
