@@ -4,10 +4,10 @@ from sqlalchemy import text
 from ..db.conn import DIMainDB
 from ..schema.client_telemetry import UploadPayload
 
-router = APIRouter()
+router = APIRouter(prefix="/telemetry")
 
 
-@router.post("/telemetry/pm/upload-v1", status_code=204)
+@router.post("/pm/upload-v1", status_code=204)
 async def telemetry_pm_upload_v1(payload: UploadPayload, main_db: DIMainDB) -> None:
     if payload.fmt != 1:
         raise ValueError("Invalid telemetry format version")

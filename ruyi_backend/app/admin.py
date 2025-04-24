@@ -19,10 +19,10 @@ from ..schema.admin import ReqProcessTelemetry
 from ..schema.client_telemetry import UploadPayload
 from ..components.github_stats import query_release_downloads
 
-router = APIRouter()
+router = APIRouter(prefix="/admin")
 
 
-@router.post("/admin/process-telemetry-v1", status_code=204)
+@router.post("/process-telemetry-v1", status_code=204)
 async def admin_process_telemetry(
     req: ReqProcessTelemetry,
     main_db: DIMainDB,
