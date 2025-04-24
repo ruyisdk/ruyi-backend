@@ -7,10 +7,10 @@ from ..db.conn import DIMainDB
 from ..es import DIMainES
 from ..schema.frontend import DashboardDataV1
 
-router = APIRouter()
+router = APIRouter(prefix="/fe")
 
 
-@router.post("/fe/dashboard")
+@router.post("/dashboard")
 async def get_dashboard_data_v1(
     main_db: DIMainDB,
     main_es: DIMainES,

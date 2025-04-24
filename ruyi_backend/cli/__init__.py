@@ -11,6 +11,7 @@ from typing import NoReturn
 from ..config import get_env_config, init
 from .cmd_sync_releases import do_sync_releases
 
+
 def main(argv: list[str]) -> int:
     """Real entrypoint of ruyi-backend, allowing to customize argv."""
 
