@@ -40,30 +40,27 @@ def get_supported_arches(release_stat: ReleaseDownloadStats) -> list[str]:
     return list(sorted(arches))
 
 
+# TODO: make the list of mirrors customizable
+DL_MIRRORS = [
+    "https://github.com/ruyisdk/ruyi/releases/download/",
+    "https://mirror.iscas.ac.cn/ruyisdk/ruyi/tags/",
+]
+
+
 # Stub function for download URL generation
-def _download_urls_for_one_asset(ver: str, channel: str, arch: str) -> list[str]:
+def _download_urls_for_one_asset(ver: str, arch: str) -> list[str]:
     arch_dl = ARCH_NAME_UNAME_TO_DL.get(arch, arch)
-
-    # TODO: make the list of mirrors customizable
-    return [
-        f"https://github.com/ruyisdk/ruyi/releases/download/{ver}/ruyi-{ver}.{arch_dl}",
-        f"https://mirror.iscas.ac.cn/ruyisdk/ruyi/{channel}/{ver}/ruyi.{arch_dl}",
-    ]
+    return [base + f"{ver}/ruyi-{ver}.{arch_dl}" for base in DL_MIRRORS]
 
 
-def _generate_download_urls(
-    release_stat: ReleaseDownloadStats,
-    channel: str,
-) -> dict[str, list[str]]:
+def _generate_download_urls(s: ReleaseDownloadStats) -> dict[str, list[str]]:
     """Generates download URLs for the given release."""
 
     # FIXME: we currently only provide Linux binaries, so the "linux" part is hardcoded
     # for now
     return {
-        f"linux/{arch}": _download_urls_for_one_asset(
-            release_stat["tag"], channel, arch
-        )
-        for arch in get_supported_arches(release_stat)
+        f"linux/{arch}": _download_urls_for_one_asset(s["tag"], arch)
+        for arch in get_supported_arches(s)
     }
 
 
@@ -99,7 +96,7 @@ def _get_latest_releases(
         releases[channel] = ReleaseDetailV1(
             version=str(v),
             channel=channel,
-            download_urls=_generate_download_urls(release_stat, channel),
+            download_urls=_generate_download_urls(release_stat),
         )
     return LatestReleasesV1(channels=releases)
 
