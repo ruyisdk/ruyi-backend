@@ -162,7 +162,7 @@ class Rsync:
         remote_spec = f"{self.conn_url}/tags/{rel.name}/"
         local_spec = f"{rel_dir}/"
         await self._call_rsync(
-            True, "-avHPL", "--exclude=.synced", local_spec, remote_spec
+            True, "-avHP", "--exclude=.synced", local_spec, remote_spec
         )
 
         # sync the channel symlink
