@@ -88,8 +88,12 @@ class RsyncStagingDir:
     ) -> anyio.Path:
         return self.get_local_release_dir(rel) / f".{marker}"
 
-    async def is_release_synced(self, rel: Release) -> bool:
-        return await self.get_marker_path_for_release(rel, "synced").exists()
+    async def is_release_synced(self, rel: Release, remote: "Rsync") -> bool:
+        if await self.get_marker_path_for_release(rel, "synced").exists():
+            return True
+        # check if the remote has this version, for cold-starts without any
+        # local state to be idempotent
+        return await remote.check_remote(rel)
 
     async def mark_release_synced(self, rel: Release) -> None:
         await self.get_marker_path_for_release(rel, "synced").touch()
@@ -127,6 +131,30 @@ class Rsync:
             raise RuntimeError(f"rsync failed with code {retcode}")
         return retcode
 
+    async def check_remote(self, rel: Release) -> bool:
+        rel_dir = self.state_store.get_local_release_dir(rel)
+        channel_symlink = self.state_store.get_local_channel_symlink(rel)
+
+        remote_spec = f"{self.conn_url}/tags/{rel.name}/"
+        local_spec = f"{rel_dir}/"
+        retcode = await self._call_rsync(
+            False, "-avHP", remote_spec, local_spec
+        )
+        if retcode != 0:
+            # remote does not have this version, so we need to continue syncing
+            return False
+
+        # remote already has this version but we didn't before the sync attempt,
+        # add back the synced marker and tag symlink locally
+        await self.state_store.mark_release_synced(rel)
+
+        channel_dir = channel_symlink.parent
+        await channel_dir.mkdir(parents=True, exist_ok=True)
+        target = rel_dir.relative_to(channel_dir, walk_up=True)
+        await channel_symlink.symlink_to(target)
+
+        return True
+
     async def sync(self, rel: Release) -> None:
         rel_dir = self.state_store.get_local_release_dir(rel)
         channel_symlink = self.state_store.get_local_channel_symlink(rel)
@@ -134,7 +162,7 @@ class Rsync:
         remote_spec = f"{self.conn_url}/tags/{rel.name}/"
         local_spec = f"{rel_dir}/"
         await self._call_rsync(
-            True, "-avHPL", "--exclude=.synced", local_spec, remote_spec
+            True, "-avHP", "--exclude=.synced", local_spec, remote_spec
         )
 
         # sync the channel symlink
@@ -215,7 +243,7 @@ class ReleaseSyncer:
         channel = "testing" if gh_rel["prerelease"] or ver.prerelease else "stable"
         rel = Release(channel, name)
 
-        is_synced = await self.state_store.is_release_synced(rel)
+        is_synced = await self.state_store.is_release_synced(rel, self.remote)
         synced_str = "synced" if is_synced else "needs sync"
         self.logger.info("%s: %s %s", name, channel, synced_str)
         if is_synced:
