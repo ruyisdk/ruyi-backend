@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1
-FROM python:3.13-alpine3.20 AS builder
+FROM python:3.13-alpine3.21 AS builder
 
 # for building asyncmy on arm64
 RUN apk update && apk add gcc libc-dev
@@ -15,7 +15,7 @@ RUN touch README.md
 COPY pyproject.toml poetry.lock LICENSE ./
 RUN --mount=type=cache,target=$POETRY_CACHE_DIR poetry install --without dev --no-root
 
-FROM python:3.13-alpine3.20
+FROM python:3.13-alpine3.21
 ENV VIRTUAL_ENV=/app/.venv \
     PATH="/app/.venv/bin:$PATH"
 COPY --from=builder ${VIRTUAL_ENV} ${VIRTUAL_ENV}
