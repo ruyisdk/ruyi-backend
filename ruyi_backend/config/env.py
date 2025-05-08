@@ -26,6 +26,9 @@ class GitHubConfig(BaseModel):
     base_url: str = "https://api.github.com"
     user_agent: str = "ruyisdk/ruyi-backend"
 
+    ruyi_backend_repo: str = "ruyisdk/ruyi-backend"
+    ruyi_pm_repo: str = "ruyisdk/ruyi"
+
 
 class HTTPConfig(BaseModel):
     """Configuration for an HTTP client."""
