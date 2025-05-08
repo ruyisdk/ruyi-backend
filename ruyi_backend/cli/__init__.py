@@ -37,7 +37,12 @@ def main(argv: list[str]) -> int:
     args = parser.parse_args(argv[1:])
     match args.command:
         case "sync-releases":
-            return asyncio.run(do_sync_releases(cfg.cli.release_worker))
+            return asyncio.run(
+                do_sync_releases(
+                    cfg.cli.release_worker,
+                    cfg.github.ruyi_pm_repo,
+                )
+            )
 
     return 0
 

@@ -11,7 +11,6 @@ from semver import Version
 from ..config.env import ReleaseWorkerConfig
 from ..gh import get_github
 
-GITHUB_OWNER_REPO = "ruyisdk/ruyi"
 RE_TARBALL_NAME = re.compile(r"\.tar(?:\.Z|\.gz|\.bz2|\.lz|\.lzma|\.xz|\.zst)?$")
 RE_RUYI_RELEASE_ASSET_NAME = re.compile(
     r"^ruyi-(?P<ver>[0-9a-z.-]+)\.(?P<platform>[0-9a-z-]+)(?P<exe_suffix>\.exe)?$"
@@ -221,10 +220,10 @@ class ReleaseSyncer:
             local_file_symlink = local_dir / transform_asset_name(name)
             await local_file_symlink.symlink_to(local_file.name)
 
-    async def run(self) -> int:
+    async def run(self, repo: str) -> int:
         self.logger.info("rsync staging directory at %s", self.state_store.local_dir)
 
-        releases = await list_releases(self.gh, GITHUB_OWNER_REPO)
+        releases = await list_releases(self.gh, repo)
         tasks = [self.run_one(gh_rel) for gh_rel in releases]
         await asyncio.gather(*tasks)
         return 0
@@ -271,6 +270,6 @@ class ReleaseSyncer:
         await self.state_store.mark_release_synced(rel)
 
 
-async def do_sync_releases(cfg: ReleaseWorkerConfig) -> int:
+async def do_sync_releases(cfg: ReleaseWorkerConfig, repo: str) -> int:
     syncer = ReleaseSyncer(cfg)
-    return await syncer.run()
+    return await syncer.run(repo)

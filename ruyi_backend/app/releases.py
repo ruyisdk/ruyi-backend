@@ -3,6 +3,7 @@ from typing import Final, cast
 from fastapi import APIRouter
 
 from ..cache import DICacheStore, KEY_GITHUB_RELEASE_STATS
+from ..config.env import DIEnvConfig
 from ..schema.releases import LatestReleasesV1, ReleaseDetailV1
 import semver
 from ..components.github_stats import ReleaseDownloadStats
@@ -40,32 +41,43 @@ def get_supported_arches(release_stat: ReleaseDownloadStats) -> list[str]:
     return list(sorted(arches))
 
 
-# TODO: make the list of mirrors customizable
-DL_MIRRORS = [
-    "https://github.com/ruyisdk/ruyi/releases/download/",
-    "https://mirror.iscas.ac.cn/ruyisdk/ruyi/tags/",
-]
+def get_dl_mirrors(pm_repo: str) -> list[str]:
+    """Returns a list of download mirrors."""
+
+    # TODO: make the list of mirrors customizable
+    return [
+        f"https://github.com/{pm_repo}/releases/download/",
+        "https://mirror.iscas.ac.cn/ruyisdk/ruyi/tags/",
+    ]
 
 
 # Stub function for download URL generation
-def _download_urls_for_one_asset(ver: str, arch: str) -> list[str]:
+def _download_urls_for_one_asset(
+    ver: str,
+    arch: str,
+    pm_repo: str,
+) -> list[str]:
     arch_dl = ARCH_NAME_UNAME_TO_DL.get(arch, arch)
-    return [base + f"{ver}/ruyi-{ver}.{arch_dl}" for base in DL_MIRRORS]
+    return [base + f"{ver}/ruyi-{ver}.{arch_dl}" for base in get_dl_mirrors(pm_repo)]
 
 
-def _generate_download_urls(s: ReleaseDownloadStats) -> dict[str, list[str]]:
+def _generate_download_urls(
+    s: ReleaseDownloadStats,
+    pm_repo: str,
+) -> dict[str, list[str]]:
     """Generates download URLs for the given release."""
 
     # FIXME: we currently only provide Linux binaries, so the "linux" part is hardcoded
     # for now
     return {
-        f"linux/{arch}": _download_urls_for_one_asset(s["tag"], arch)
+        f"linux/{arch}": _download_urls_for_one_asset(s["tag"], arch, pm_repo)
         for arch in get_supported_arches(s)
     }
 
 
 def _get_latest_releases(
     stats: list[ReleaseDownloadStats],
+    pm_repo: str,
 ) -> LatestReleasesV1:
     """Returns the latest releases for each channel."""
 
@@ -96,15 +108,16 @@ def _get_latest_releases(
         releases[channel] = ReleaseDetailV1(
             version=str(v),
             channel=channel,
-            download_urls=_generate_download_urls(release_stat),
+            download_urls=_generate_download_urls(release_stat, pm_repo),
         )
     return LatestReleasesV1(channels=releases)
 
 
 @router.get("/latest-pm")
 async def get_latest_pm_releases(
+    cfg: DIEnvConfig,
     cache: DICacheStore,
 ) -> LatestReleasesV1:
     # use the cached GitHub release stats as the data source
     stats = cast(list[ReleaseDownloadStats], await cache.get(KEY_GITHUB_RELEASE_STATS))
-    return _get_latest_releases(stats)
+    return _get_latest_releases(stats, cfg.github.ruyi_pm_repo)
