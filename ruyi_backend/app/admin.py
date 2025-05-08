@@ -11,6 +11,7 @@ from ..cache import (
 )
 from ..components.frontend_dashboard_processor import crunch_and_cache_dashboard_numbers
 from ..components.telemetry_processor import process_telemetry_data
+from ..config.env import DIEnvConfig
 from ..db.conn import DIMainDB
 from ..db.schema import telemetry_raw_uploads, ModelTelemetryRawUpload
 from ..es import DIMainES
@@ -77,6 +78,7 @@ async def admin_process_telemetry(
 
 @router.post("/admin/refresh-github-stats-v1", status_code=204)
 async def admin_refresh_github_stats(
+    cfg: DIEnvConfig,
     cache: DICacheStore,
     db: DIMainDB,
     es: DIMainES,
@@ -84,10 +86,7 @@ async def admin_refresh_github_stats(
 ) -> None:
     """Refreshes the cached GitHub stats."""
 
-    # TODO: make this configurable
-    project = "ruyisdk/ruyi"
-
-    stats = await query_release_downloads(github, project)
+    stats = await query_release_downloads(github, cfg.github.ruyi_pm_repo)
     await cache.set(KEY_GITHUB_RELEASE_STATS, stats)
 
     # refresh frontend dashboard numbers

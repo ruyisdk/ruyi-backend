@@ -1,4 +1,4 @@
-from typing import Annotated, TypeAlias
+from typing import Annotated, Any, TypeAlias
 
 from fastapi import Depends
 from pydantic import BaseModel
@@ -24,7 +24,14 @@ class GitHubConfig(BaseModel):
 
     api_token: str = ""
     base_url: str = "https://api.github.com"
-    user_agent: str = "ruyisdk/ruyi-backend"
+    user_agent: str = ""
+
+    ruyi_backend_repo: str = "ruyisdk/ruyi-backend"
+    ruyi_pm_repo: str = "ruyisdk/ruyi"
+
+    def model_post_init(self, context: Any) -> None:
+        super().model_post_init(context)
+        self.user_agent = self.user_agent or self.ruyi_backend_repo
 
 
 class HTTPConfig(BaseModel):
