@@ -16,6 +16,10 @@ COPY pyproject.toml poetry.lock LICENSE ./
 RUN --mount=type=cache,target=$POETRY_CACHE_DIR poetry install --without dev --no-root
 
 FROM python:3.13-alpine3.21
+
+# for running tools and debugging
+RUN apk add --no-cache mariadb rsync valkey
+
 ENV VIRTUAL_ENV=/app/.venv \
     PATH="/app/.venv/bin:$PATH"
 COPY --from=builder ${VIRTUAL_ENV} ${VIRTUAL_ENV}
