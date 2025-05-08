@@ -40,7 +40,7 @@ There are also some convenience facilities provided for easier debugging:
 
 ## Contributing
 
-We welcome contributions to Ruyi! Please see our [contribution guidelines](./CONTRIBUTING.md) ([中文](./CONTRIBUTING.zh.md)) for details on how to get started.
+We welcome contributions to RuyiSDK! Please see our [contribution guidelines](./CONTRIBUTING.md) ([中文](./CONTRIBUTING.zh.md)) for details on how to get started.
 
 ## License
 
