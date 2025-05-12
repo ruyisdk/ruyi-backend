@@ -20,11 +20,6 @@ class ReleaseDetailV1(BaseModel):
     "linux/x86_64", "linux/aarch64", "windows/x86_64", etc.
     """
 
-    # TODO: sync changelogs from the tag description and/or the corresponding
-    # news item
-    # changelog_url: str
-    # """Changelog URL."""
-
 
 class LatestReleasesV1(BaseModel):
     """Latest releases info."""

@@ -1,12 +1,14 @@
+import json
 from typing import Final, cast
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Response
+import semver
 
 from ..cache import DICacheStore, KEY_GITHUB_RELEASE_STATS
 from ..config.env import DIEnvConfig
-from ..schema.releases import LatestReleasesV1, ReleaseDetailV1
-import semver
 from ..components.github_stats import ReleaseDownloadStats
+from ..components.news_items import get_news_item_markdown
+from ..schema.releases import LatestReleasesV1, ReleaseDetailV1
 
 router = APIRouter(prefix="/releases")
 
@@ -122,3 +124,27 @@ async def get_latest_pm_releases(
     # use the cached GitHub release stats as the data source
     stats = cast(list[ReleaseDownloadStats], await cache.get(KEY_GITHUB_RELEASE_STATS))
     return _get_latest_releases(stats, cfg.github.ruyi_pm_repo)
+
+
+@router.get("/changelog/news/{tag}.json")
+async def get_news_changelog(
+    tag: str,
+    cache: DICacheStore,
+) -> Response:
+    """Returns the changelog news item for the given tag if present."""
+
+    try:
+        sv = semver.Version.parse(tag)
+    except ValueError:
+        return Response(status_code=404)
+
+    # by convention RuyiSDK x.y.0 is called "x.y" in news item IDs
+    version_str = f"{sv.major}.{sv.minor}" if sv.patch == 0 else str(sv)
+    content = await get_news_item_markdown(f"ruyi-{version_str}", cache)
+    if not content:
+        return Response(status_code=404)
+
+    return Response(
+        json.dumps(content, ensure_ascii=False, separators=(",", ":")),
+        media_type="application/json",
+    )
