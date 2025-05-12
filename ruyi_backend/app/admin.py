@@ -10,7 +10,7 @@ from ..cache import (
     KEY_TELEMETRY_DATA_LAST_PROCESSED,
 )
 from ..components.frontend_dashboard_processor import crunch_and_cache_dashboard_numbers
-from ..components.news_item_processor import refresh_news_items
+from ..components.news_items import refresh_news_items
 from ..components.telemetry_processor import process_telemetry_data
 from ..config.env import DIEnvConfig
 from ..db.conn import DIMainDB

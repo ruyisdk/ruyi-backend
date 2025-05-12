@@ -1,3 +1,4 @@
+import datetime
 from typing import Any, TypedDict
 
 from githubkit import GitHub
@@ -8,6 +9,7 @@ query AssetDownloadsStats($owner: String!, $name: String!, $cursor: String, $pag
     releases(first: $pageSize, after: $cursor) {
       nodes {
         tagName
+        publishedAt
         releaseAssets(first: 16) {
           nodes {
             name
@@ -32,6 +34,7 @@ class AssetDownloadStats(TypedDict):
 
 class ReleaseDownloadStats(TypedDict):
     tag: str
+    date: datetime.datetime
     assets: list[AssetDownloadStats]
 
 
@@ -52,11 +55,12 @@ async def query_release_downloads(
         data = resp["repository"]["releases"]
         for rel in data["nodes"]:
             tag = rel["tagName"]
+            date = datetime.datetime.fromisoformat(rel["publishedAt"])
             assets = [
                 AssetDownloadStats(name=a["name"], download_count=a["downloadCount"])
                 for a in rel["releaseAssets"]["nodes"]
             ]
-            result.append(ReleaseDownloadStats(tag=tag, assets=assets))
+            result.append(ReleaseDownloadStats(tag=tag, date=date, assets=assets))
         page_info = data["pageInfo"]
         if not page_info.get("hasNextPage"):
             break

@@ -1,12 +1,13 @@
 from typing import Final, cast
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Response
+import semver
 
 from ..cache import DICacheStore, KEY_GITHUB_RELEASE_STATS
 from ..config.env import DIEnvConfig
-from ..schema.releases import LatestReleasesV1, ReleaseDetailV1
-import semver
 from ..components.github_stats import ReleaseDownloadStats
+from ..components.news_items import NEWS_ITEM_NOT_FOUND, get_news_item_markdown
+from ..schema.releases import LatestReleasesV1, ReleaseDetailV1
 
 router = APIRouter(prefix="/releases")
 
@@ -108,6 +109,7 @@ def _get_latest_releases(
         releases[channel] = ReleaseDetailV1(
             version=str(v),
             channel=channel,
+            release_date=release_stat["date"],
             download_urls=_generate_download_urls(release_stat, pm_repo),
         )
     return LatestReleasesV1(channels=releases)
@@ -121,3 +123,27 @@ async def get_latest_pm_releases(
     # use the cached GitHub release stats as the data source
     stats = cast(list[ReleaseDownloadStats], await cache.get(KEY_GITHUB_RELEASE_STATS))
     return _get_latest_releases(stats, cfg.github.ruyi_pm_repo)
+
+
+@router.get("/changelog/news/{tag}.json")
+async def get_news_changelog(
+    tag: str,
+    cache: DICacheStore,
+    response: Response,
+) -> dict[str, str]:
+    """Returns the changelog news item for the given tag if present."""
+
+    try:
+        sv = semver.Version.parse(tag)
+    except ValueError:
+        response.status_code = 404
+        return NEWS_ITEM_NOT_FOUND
+
+    # by convention RuyiSDK x.y.0 is called "x.y" in news item IDs
+    version_str = f"{sv.major}.{sv.minor}" if sv.patch == 0 else str(sv)
+    content = await get_news_item_markdown(f"ruyi-{version_str}", cache)
+    if not content:
+        response.status_code = 404
+        return NEWS_ITEM_NOT_FOUND
+
+    return content
