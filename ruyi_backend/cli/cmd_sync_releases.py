@@ -136,9 +136,7 @@ class Rsync:
 
         remote_spec = f"{self.conn_url}/tags/{rel.name}/"
         local_spec = f"{rel_dir}/"
-        retcode = await self._call_rsync(
-            False, "-avHP", remote_spec, local_spec
-        )
+        retcode = await self._call_rsync(False, "-avHP", remote_spec, local_spec)
         if retcode != 0:
             # remote does not have this version, so we need to continue syncing
             return False

@@ -38,12 +38,10 @@ async def crunch_and_cache_dashboard_numbers(
         # graceful degrade to something sensible
         last_updated = datetime.datetime.now(datetime.timezone.utc)
 
-    pm_gh_downloads: int
-    try:
-        gh_stats: list[ReleaseDownloadStats] = await cache.get(KEY_GITHUB_RELEASE_STATS)
+    pm_gh_downloads = 0
+    gh_stats: list[ReleaseDownloadStats] | None
+    if gh_stats := await cache.get(KEY_GITHUB_RELEASE_STATS):
         pm_gh_downloads = merge_download_counts(gh_stats)
-    except Exception:
-        pm_gh_downloads = 0
 
     # query download counts from ES
     now = datetime.datetime.now(tz=datetime.timezone.utc)

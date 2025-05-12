@@ -10,6 +10,7 @@ from ..cache import (
     KEY_TELEMETRY_DATA_LAST_PROCESSED,
 )
 from ..components.frontend_dashboard_processor import crunch_and_cache_dashboard_numbers
+from ..components.news_item_processor import refresh_news_items
 from ..components.telemetry_processor import process_telemetry_data
 from ..config.env import DIEnvConfig
 from ..db.conn import DIMainDB
@@ -76,7 +77,7 @@ async def admin_process_telemetry(
         pass
 
 
-@router.post("/admin/refresh-github-stats-v1", status_code=204)
+@router.post("/refresh-github-stats-v1", status_code=204)
 async def admin_refresh_github_stats(
     cfg: DIEnvConfig,
     cache: DICacheStore,
@@ -95,3 +96,14 @@ async def admin_refresh_github_stats(
             await crunch_and_cache_dashboard_numbers(conn, es, cache)
     except Exception:
         pass
+
+
+@router.post("/refresh-repo-news-v1", status_code=204)
+async def admin_refresh_repo_news(
+    cfg: DIEnvConfig,
+    cache: DICacheStore,
+    github: DIGitHub,
+) -> None:
+    """Refreshes the cached RuyiSDK repository news items."""
+
+    await refresh_news_items(github, cache, cfg.github.ruyi_packages_index_repo)

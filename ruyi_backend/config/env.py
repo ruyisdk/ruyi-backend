@@ -27,6 +27,7 @@ class GitHubConfig(BaseModel):
     user_agent: str = ""
 
     ruyi_backend_repo: str = "ruyisdk/ruyi-backend"
+    ruyi_packages_index_repo: str = "ruyisdk/packages-index"
     ruyi_pm_repo: str = "ruyisdk/ruyi"
 
     def model_post_init(self, context: Any) -> None:

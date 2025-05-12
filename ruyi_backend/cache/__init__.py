@@ -57,3 +57,9 @@ KEY_GITHUB_RELEASE_STATS = "github:release-stats"
 
 KEY_FRONTEND_DASHBOARD = "frontend:dashboard"
 """Frontend dashboard data."""
+
+KEY_PREFIX_NEWS_ITEM_CONTENT = "news:item:content:"
+"""Prefix for cached news item contents."""
+
+KEY_PREFIX_NEWS_ITEM_HASH = "news:item:hash:"
+"""Prefix for cached content hashes of news items."""
