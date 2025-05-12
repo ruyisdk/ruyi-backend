@@ -24,37 +24,37 @@ def test_get_latest_releases(release_stats: List[ReleaseDownloadStats]) -> None:
     assert set(channels.keys()) == {"stable", "testing"}
 
     stable = channels["stable"]
-    assert stable.version == "0.31.0"
+    assert stable.version == "0.32.0"
     assert stable.channel == "stable"
     assert stable.download_urls == {
         "linux/aarch64": [
-            "https://github.com/foo/bar/releases/download/0.31.0/ruyi-0.31.0.arm64",
-            "https://mirror.iscas.ac.cn/ruyisdk/ruyi/tags/0.31.0/ruyi-0.31.0.arm64",
+            "https://github.com/foo/bar/releases/download/0.32.0/ruyi-0.32.0.arm64",
+            "https://mirror.iscas.ac.cn/ruyisdk/ruyi/tags/0.32.0/ruyi-0.32.0.arm64",
         ],
         "linux/riscv64": [
-            "https://github.com/foo/bar/releases/download/0.31.0/ruyi-0.31.0.riscv64",
-            "https://mirror.iscas.ac.cn/ruyisdk/ruyi/tags/0.31.0/ruyi-0.31.0.riscv64",
+            "https://github.com/foo/bar/releases/download/0.32.0/ruyi-0.32.0.riscv64",
+            "https://mirror.iscas.ac.cn/ruyisdk/ruyi/tags/0.32.0/ruyi-0.32.0.riscv64",
         ],
         "linux/x86_64": [
-            "https://github.com/foo/bar/releases/download/0.31.0/ruyi-0.31.0.amd64",
-            "https://mirror.iscas.ac.cn/ruyisdk/ruyi/tags/0.31.0/ruyi-0.31.0.amd64",
+            "https://github.com/foo/bar/releases/download/0.32.0/ruyi-0.32.0.amd64",
+            "https://mirror.iscas.ac.cn/ruyisdk/ruyi/tags/0.32.0/ruyi-0.32.0.amd64",
         ],
     }
 
     testing = channels["testing"]
-    assert testing.version == "0.32.0-alpha.20250409"
+    assert testing.version == "0.32.0-beta.20250421"
     assert testing.channel == "testing"
     assert testing.download_urls == {
         "linux/aarch64": [
-            "https://github.com/foo/bar/releases/download/0.32.0-alpha.20250409/ruyi-0.32.0-alpha.20250409.arm64",
-            "https://mirror.iscas.ac.cn/ruyisdk/ruyi/tags/0.32.0-alpha.20250409/ruyi-0.32.0-alpha.20250409.arm64",
+            "https://github.com/foo/bar/releases/download/0.32.0-beta.20250421/ruyi-0.32.0-beta.20250421.arm64",
+            "https://mirror.iscas.ac.cn/ruyisdk/ruyi/tags/0.32.0-beta.20250421/ruyi-0.32.0-beta.20250421.arm64",
         ],
         "linux/riscv64": [
-            "https://github.com/foo/bar/releases/download/0.32.0-alpha.20250409/ruyi-0.32.0-alpha.20250409.riscv64",
-            "https://mirror.iscas.ac.cn/ruyisdk/ruyi/tags/0.32.0-alpha.20250409/ruyi-0.32.0-alpha.20250409.riscv64",
+            "https://github.com/foo/bar/releases/download/0.32.0-beta.20250421/ruyi-0.32.0-beta.20250421.riscv64",
+            "https://mirror.iscas.ac.cn/ruyisdk/ruyi/tags/0.32.0-beta.20250421/ruyi-0.32.0-beta.20250421.riscv64",
         ],
         "linux/x86_64": [
-            "https://github.com/foo/bar/releases/download/0.32.0-alpha.20250409/ruyi-0.32.0-alpha.20250409.amd64",
-            "https://mirror.iscas.ac.cn/ruyisdk/ruyi/tags/0.32.0-alpha.20250409/ruyi-0.32.0-alpha.20250409.amd64",
+            "https://github.com/foo/bar/releases/download/0.32.0-beta.20250421/ruyi-0.32.0-beta.20250421.amd64",
+            "https://mirror.iscas.ac.cn/ruyisdk/ruyi/tags/0.32.0-beta.20250421/ruyi-0.32.0-beta.20250421.amd64",
         ],
     }
