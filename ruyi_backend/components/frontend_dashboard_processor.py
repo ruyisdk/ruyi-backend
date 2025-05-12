@@ -1,3 +1,4 @@
+from asyncio import gather
 import datetime
 from typing import cast
 
@@ -66,9 +67,23 @@ async def crunch_and_cache_dashboard_numbers(
         )
         return cast(int, resp["count"])
 
+    mirror_category_download_counts = await gather(
+        query_es_count("/ruyisdk/3rdparty/*"),
+        query_es_count("/ruyisdk/dist/*"),
+        query_es_count("/ruyisdk/humans/*"),
+        query_es_count("/ruyisdk/ide/*"),
+        query_es_count("/ruyisdk/ruyi/*"),
+    )
+
     # only /ruyisdk/ruyi/ paths correspond to the RuyiSDK PM
-    pm_download_count = await query_es_count("/ruyisdk/ruyi/*") + pm_gh_downloads
-    pkg_download_count = await query_es_count("/ruyisdk/dist/*")
+    pm_download_count = mirror_category_download_counts[4] + pm_gh_downloads
+    pkg_download_count = mirror_category_download_counts[1]
+
+    other_categories = {
+        "3rdparty": DashboardEventDetailV1(total=mirror_category_download_counts[0]),
+        "humans": DashboardEventDetailV1(total=mirror_category_download_counts[2]),
+        "ide": DashboardEventDetailV1(total=mirror_category_download_counts[3]),
+    }
 
     # count total installations
     installation_count = await db.scalar(
@@ -112,6 +127,7 @@ async def crunch_and_cache_dashboard_numbers(
         last_updated=last_updated,
         downloads=DashboardEventDetailV1(total=pkg_download_count),
         pm_downloads=DashboardEventDetailV1(total=pm_download_count),
+        other_categories_downloads=other_categories,
         installs=DashboardEventDetailV1(total=installation_count),
         top_packages={},  # TODO: numbers are not reported yet
         top_commands=top10_sorted_commands,
