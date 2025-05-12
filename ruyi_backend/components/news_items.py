@@ -175,3 +175,11 @@ async def maybe_update_news_item(
     # update the cache
     await cache.set(item.hash_cache_key, item.content_hash)
     await cache.hset(item.content_cache_key, item.lang_code, resp.text)
+
+
+async def get_news_item_markdown(
+    item_id: str,
+    cache: CacheStore,
+) -> dict[str, str] | None:
+    item = await cache.hgetall(KEY_PREFIX_NEWS_ITEM_CONTENT + item_id)
+    return item if item else None

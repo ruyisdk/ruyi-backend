@@ -2,7 +2,8 @@ import json
 
 from fastapi import APIRouter, Response
 
-from ..cache import DICacheStore, KEY_PREFIX_NEWS_ITEM_CONTENT
+from ..cache import DICacheStore
+from ..components.news_items import get_news_item_markdown
 
 router = APIRouter(prefix="/news")
 
@@ -14,7 +15,7 @@ async def get_news_item_markdown_v1(
 ) -> Response:
     """Returns the news item in Markdown format."""
 
-    item = await cache.hgetall(KEY_PREFIX_NEWS_ITEM_CONTENT + item_id)
+    item = await get_news_item_markdown(item_id, cache)
     if not item:
         return Response("news item not found", status_code=404, media_type="text/plain")
 
