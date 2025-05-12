@@ -183,3 +183,9 @@ async def get_news_item_markdown(
 ) -> dict[str, str] | None:
     item = await cache.hgetall(KEY_PREFIX_NEWS_ITEM_CONTENT + item_id)
     return item if item else None
+
+
+NEWS_ITEM_NOT_FOUND = {
+    "en_US": "Specified news item does not exist yet.",
+    "zh_CN": "相应的新闻条目暂不存在。",
+}
