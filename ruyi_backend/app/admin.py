@@ -76,7 +76,7 @@ async def admin_process_telemetry(
         pass
 
 
-@router.post("/admin/refresh-github-stats-v1", status_code=204)
+@router.post("/refresh-github-stats-v1", status_code=204)
 async def admin_refresh_github_stats(
     cfg: DIEnvConfig,
     cache: DICacheStore,
