@@ -26,6 +26,7 @@ def test_get_latest_releases(release_stats: List[ReleaseDownloadStats]) -> None:
     stable = channels["stable"]
     assert stable.version == "0.32.0"
     assert stable.channel == "stable"
+    assert stable.release_date.isoformat() == "2025-04-21T23:35:47+00:00"
     assert stable.download_urls == {
         "linux/aarch64": [
             "https://github.com/foo/bar/releases/download/0.32.0/ruyi-0.32.0.arm64",
@@ -44,6 +45,7 @@ def test_get_latest_releases(release_stats: List[ReleaseDownloadStats]) -> None:
     testing = channels["testing"]
     assert testing.version == "0.32.0-beta.20250421"
     assert testing.channel == "testing"
+    assert testing.release_date.isoformat() == "2025-04-21T14:33:33+00:00"
     assert testing.download_urls == {
         "linux/aarch64": [
             "https://github.com/foo/bar/releases/download/0.32.0-beta.20250421/ruyi-0.32.0-beta.20250421.arm64",

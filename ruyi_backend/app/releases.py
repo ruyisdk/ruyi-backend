@@ -108,6 +108,7 @@ def _get_latest_releases(
         releases[channel] = ReleaseDetailV1(
             version=str(v),
             channel=channel,
+            release_date=release_stat["date"],
             download_urls=_generate_download_urls(release_stat, pm_repo),
         )
     return LatestReleasesV1(channels=releases)

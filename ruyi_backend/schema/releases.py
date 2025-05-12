@@ -1,3 +1,5 @@
+import datetime
+
 from pydantic import BaseModel
 
 
@@ -9,9 +11,8 @@ class ReleaseDetailV1(BaseModel):
     channel: str
     """Release channel."""
 
-    # TODO: record the release dates on github stats sync
-    # release_date: datetime.datetime
-    # """Release date."""
+    release_date: datetime.datetime
+    """Release date."""
 
     download_urls: dict[str, list[str]]
     """Download URLs for this release. The key is the OS and architecture combo
