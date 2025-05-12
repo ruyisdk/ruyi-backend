@@ -1,3 +1,4 @@
+from inspect import isawaitable
 from typing import Any
 
 import msgpack
@@ -38,3 +39,35 @@ class CacheStore:
             nx=nx,
             xx=xx,
         )
+
+    async def hget(self, name: str, key: str) -> Any:
+        name = self._get_prefixed_key(name)
+        v = self._redis.hget(name, key)
+        val = await v if isawaitable(v) else v
+        if val is None:
+            return None
+        return msgpack.loads(val.encode("latin-1"), timestamp=3)
+
+    async def hgetall(self, name: str) -> dict[str, Any]:
+        name = self._get_prefixed_key(name)
+        v = self._redis.hgetall(name)
+        val = await v if isawaitable(v) else v
+        return {
+            k.decode("utf-8"): msgpack.loads(v, timestamp=3) for k, v in val.items()
+        }
+
+    async def hset(
+        self,
+        name: str,
+        key: str,
+        val: Any,
+    ) -> Any:
+        name = self._get_prefixed_key(name)
+        payload = msgpack.dumps(val, datetime=True)
+        # TODO: handle the response according to the protocol
+        v = self._redis.hset(
+            name,
+            key,
+            payload,  # type: ignore[arg-type]  # bytes is actually accepted
+        )
+        return await v if isawaitable(v) else v
