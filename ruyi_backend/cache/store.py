@@ -16,9 +16,11 @@ class CacheStore:
     async def ping(self) -> None:
         await self._redis.ping()
 
-    async def get(self, key: str) -> Any:
+    async def get(self, key: str) -> Any | None:
         key = self._get_prefixed_key(key)
         val = await self._redis.get(key)
+        if val is None:
+            return None
         if not isinstance(val, bytes):
             raise TypeError("Redis response not in raw bytes")
         return msgpack.loads(val, timestamp=3)
