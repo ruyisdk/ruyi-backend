@@ -148,7 +148,10 @@ class Rsync:
         channel_dir = channel_symlink.parent
         await channel_dir.mkdir(parents=True, exist_ok=True)
         target = rel_dir.relative_to(channel_dir, walk_up=True)
-        await channel_symlink.symlink_to(target)
+        try:
+            await channel_symlink.symlink_to(target)
+        except FileExistsError:
+            pass
 
         return True
 
@@ -205,9 +208,8 @@ class ReleaseSyncer:
             self.logger.info("removing %s", local_file)
             await local_file.unlink(missing_ok=True)
             await download_gh_release_asset_to(self.gh, asset, local_file)
-            filemode = (
-                0o755 if RE_TARBALL_NAME.search(local_file.name) is None else 0o644
-            )
+            is_tarball = RE_TARBALL_NAME.search(local_file.name) is not None
+            filemode = 0o644 if is_tarball else 0o755
             await local_file.chmod(filemode)
 
             # make compat symlink for the onefile distribution assets
@@ -215,8 +217,9 @@ class ReleaseSyncer:
             # the version number, but we prefer the GitHub Release asset names
             # now so downstream doesn't need to adapt to 2 different naming
             # conventions
-            local_file_symlink = local_dir / transform_asset_name(name)
-            await local_file_symlink.symlink_to(local_file.name)
+            if not is_tarball:
+                local_file_symlink = local_dir / transform_asset_name(name)
+                await local_file_symlink.symlink_to(local_file.name)
 
     async def run(self, repo: str) -> int:
         self.logger.info("rsync staging directory at %s", self.state_store.local_dir)
