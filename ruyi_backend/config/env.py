@@ -36,6 +36,12 @@ class GitHubConfig(BaseModel):
         self.user_agent = self.user_agent or self.ruyi_backend_repo
 
 
+class PyPIConfig(BaseModel):
+    """Configuration for PyPI access."""
+
+    ruyi_pm_package: str = "ruyi"
+
+
 class HTTPConfig(BaseModel):
     """Configuration for an HTTP client."""
 
@@ -77,6 +83,7 @@ class EnvConfig(BaseSettings, case_sensitive=False):
     es_main: ESConfig = ESConfig()
     github: GitHubConfig = GitHubConfig()
     http: HTTPConfig = HTTPConfig()
+    pypi: PyPIConfig = PyPIConfig()
 
 
 _ENV_CONFIG: EnvConfig | None = None

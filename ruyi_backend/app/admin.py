@@ -8,10 +8,16 @@ from ..cache import (
     DICacheStore,
     KEY_GITHUB_RELEASE_STATS,
     KEY_GITHUB_RELEASE_STATS_RUYI_IDE_ECLIPSE,
+    KEY_PYPI_DOWNLOAD_TOTAL_PM,
     KEY_TELEMETRY_DATA_LAST_PROCESSED,
 )
 from ..components.frontend_dashboard_processor import crunch_and_cache_dashboard_numbers
 from ..components.news_items import refresh_news_items
+from ..components.pypi_stats import (
+    fetch_pypi_download_stats,
+    persist_pypi_download_stats,
+    sum_pypi_download_stats,
+)
 from ..components.telemetry_processor import process_telemetry_data
 from ..config.env import DIEnvConfig
 from ..db.conn import DIMainDB
@@ -96,6 +102,40 @@ async def admin_refresh_github_stats(
         cfg.github.ruyi_ide_eclipse_repo,
     )
     await cache.set(KEY_GITHUB_RELEASE_STATS_RUYI_IDE_ECLIPSE, stats_ide_eclipse)
+
+    # refresh frontend dashboard numbers
+    try:
+        async with db.connect() as conn:
+            await crunch_and_cache_dashboard_numbers(conn, es, cache)
+    except Exception:
+        pass
+
+
+@router.post("/refresh-pypi-stats-v1", status_code=204)
+async def admin_refresh_pypi_stats(
+    cfg: DIEnvConfig,
+    cache: DICacheStore,
+    db: DIMainDB,
+    es: DIMainES,
+) -> None:
+    """Refreshes the cached PyPI stats."""
+
+    pkg = cfg.pypi.ruyi_pm_package
+    stats = await fetch_pypi_download_stats(pkg)
+    new_total = 0
+    async with db.connect() as conn:
+        await persist_pypi_download_stats(conn, pkg, stats)
+
+        new_total = await sum_pypi_download_stats(
+            conn,
+            date_start=datetime.date(2025, 7, 30),  # our PyPI launch date - 1
+            date_end=datetime.date.today() + datetime.timedelta(days=1),
+            package_name=pkg,
+        )
+
+    # update total download count in cache
+    if new_total > 0:
+        await cache.set(KEY_PYPI_DOWNLOAD_TOTAL_PM, new_total)
 
     # refresh frontend dashboard numbers
     try:
