@@ -75,15 +75,24 @@ async def crunch_and_cache_dashboard_numbers(
         query_es_count("/ruyisdk/ruyi/*"),
     )
 
-    # only /ruyisdk/ruyi/ paths correspond to the RuyiSDK PM
-    pm_download_count = mirror_category_download_counts[4] + pm_gh_downloads
-    pkg_download_count = mirror_category_download_counts[1]
-
-    other_categories = {
+    categories = {
+        # only /ruyisdk/ruyi/ paths correspond to the RuyiSDK PM
+        "pkg": DashboardEventDetailV1(total=mirror_category_download_counts[1]),
+        "pm:github": DashboardEventDetailV1(total=pm_gh_downloads),
+        "pm:mirror": DashboardEventDetailV1(total=mirror_category_download_counts[4]),
         "3rdparty": DashboardEventDetailV1(total=mirror_category_download_counts[0]),
         "humans": DashboardEventDetailV1(total=mirror_category_download_counts[2]),
         "ide": DashboardEventDetailV1(total=mirror_category_download_counts[3]),
     }
+
+    # compatibility response field
+    pm_downloads = DashboardEventDetailV1(
+        total=sum(v.total for k, v in categories.items() if k.startswith("pm:")),
+    )
+    other_categories = categories.copy()
+    del other_categories["pkg"]
+    del other_categories["pm:github"]
+    del other_categories["pm:mirror"]
 
     # count total installations
     installation_count = await db.scalar(
@@ -125,9 +134,10 @@ async def crunch_and_cache_dashboard_numbers(
 
     result = DashboardDataV1(
         last_updated=last_updated,
-        downloads=DashboardEventDetailV1(total=pkg_download_count),
-        pm_downloads=DashboardEventDetailV1(total=pm_download_count),
+        downloads=categories["pkg"],
+        pm_downloads=pm_downloads,
         other_categories_downloads=other_categories,
+        downloads_by_categories_v1=categories,
         installs=DashboardEventDetailV1(total=installation_count),
         top_packages={},  # TODO: numbers are not reported yet
         top_commands=top10_sorted_commands,
