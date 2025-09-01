@@ -27,6 +27,7 @@ class GitHubConfig(BaseModel):
     user_agent: str = ""
 
     ruyi_backend_repo: str = "ruyisdk/ruyi-backend"
+    ruyi_ide_eclipse_repo: str = "ruyisdk/ruyisdk-eclipse-plugins"
     ruyi_packages_index_repo: str = "ruyisdk/packages-index"
     ruyi_pm_repo: str = "ruyisdk/ruyi"
 

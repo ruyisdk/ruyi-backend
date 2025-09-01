@@ -7,6 +7,7 @@ from sqlalchemy.sql.expression import update
 from ..cache import (
     DICacheStore,
     KEY_GITHUB_RELEASE_STATS,
+    KEY_GITHUB_RELEASE_STATS_RUYI_IDE_ECLIPSE,
     KEY_TELEMETRY_DATA_LAST_PROCESSED,
 )
 from ..components.frontend_dashboard_processor import crunch_and_cache_dashboard_numbers
@@ -89,6 +90,12 @@ async def admin_refresh_github_stats(
 
     stats = await query_release_downloads(github, cfg.github.ruyi_pm_repo)
     await cache.set(KEY_GITHUB_RELEASE_STATS, stats)
+
+    stats_ide_eclipse = await query_release_downloads(
+        github,
+        cfg.github.ruyi_ide_eclipse_repo,
+    )
+    await cache.set(KEY_GITHUB_RELEASE_STATS_RUYI_IDE_ECLIPSE, stats_ide_eclipse)
 
     # refresh frontend dashboard numbers
     try:
