@@ -62,3 +62,13 @@ CREATE TABLE `telemetry_aggregated_events` (
     CHECK (JSON_VALID(`params_kv_raw`)),
     KEY `idx_telemetry_aggregated_events_ctime_time_bucket_kind` (`created_at`, `time_bucket`, `kind`)
 ) ENGINE InnoDB CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+CREATE TABLE `download_stats_daily_pypi` (
+    `id` BIGINT(20) AUTO_INCREMENT PRIMARY KEY,
+    `name` VARCHAR(255) NOT NULL COMMENT 'The name of the PyPI package',
+    `version` VARCHAR(255) NOT NULL COMMENT 'The version of the PyPI package',
+    `date` TIMESTAMP NOT NULL COMMENT 'The date of the download stats',
+    `count` INT NOT NULL DEFAULT 0 COMMENT 'The number of downloads on that date',
+    `created_at` TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE KEY `idx_download_stats_daily_pypi_name_version_date` (`name`, `version`, `date`)
+) ENGINE InnoDB CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;

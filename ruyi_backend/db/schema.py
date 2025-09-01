@@ -161,3 +161,26 @@ telemetry_aggregated_events = Table(
     ),
     CheckConstraint("JSON_VALID(`params_kv_raw`)"),
 )
+
+
+class ModelDownloadStatsDailyPyPI(TypedDict):
+    id: NotRequired[int]
+    name: str
+    version: str
+    date: datetime.datetime
+    count: int
+    created_at: NotRequired[datetime.datetime]
+
+
+download_stats_daily_pypi = Table(
+    "download_stats_daily_pypi",
+    metadata,
+    Column("id", BIGINT(), primary_key=True, autoincrement=True),
+    Column("name", VARCHAR(255), nullable=False),
+    Column("version", VARCHAR(255), nullable=False),
+    Column("date", TIMESTAMP(timezone=False), nullable=False),
+    Column("count", INT(), nullable=False, default=0),
+    Column(
+        "created_at", TIMESTAMP(timezone=False), server_default=func.current_timestamp()
+    ),
+)
