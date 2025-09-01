@@ -350,6 +350,18 @@ files = [
 ]
 
 [[package]]
+name = "chardet"
+version = "5.2.0"
+description = "Universal encoding detector for Python 3"
+optional = false
+python-versions = ">=3.7"
+groups = ["main"]
+files = [
+    {file = "chardet-5.2.0-py3-none-any.whl", hash = "sha256:e1cf59446890a00105fe7b7912492ea04b6e6f06d4b742b2c788469e34c82970"},
+    {file = "chardet-5.2.0.tar.gz", hash = "sha256:1b3b6ff479a8c414bc3fa2c0852995695c4a026dcd6d0633b2dd092ca39c1cf7"},
+]
+
+[[package]]
 name = "click"
 version = "8.2.1"
 description = "Composable command line interface toolkit"
@@ -378,6 +390,26 @@ files = [
 markers = {main = "platform_system == \"Windows\" or sys_platform == \"win32\"", dev = "sys_platform == \"win32\""}
 
 [[package]]
+name = "dataproperty"
+version = "1.1.0"
+description = "Python library for extract property from data."
+optional = false
+python-versions = ">=3.9"
+groups = ["main"]
+files = [
+    {file = "DataProperty-1.1.0-py3-none-any.whl", hash = "sha256:c61fcb2e2deca35e6d1eb1f251a7f22f0dcde63e80e61f0cc18c19f42abfd25b"},
+    {file = "dataproperty-1.1.0.tar.gz", hash = "sha256:b038437a4097d1a1c497695c3586ea34bea67fdd35372b9a50f30bf044d77d04"},
+]
+
+[package.dependencies]
+mbstrdecoder = ">=1.0.0,<2"
+typepy = {version = ">=1.3.2,<2", extras = ["datetime"]}
+
+[package.extras]
+logging = ["loguru (>=0.4.1,<1)"]
+test = ["pytest (>=6.0.1)", "pytest-md-report (>=0.6.2)", "tcolorpy (>=0.1.2)"]
+
+[[package]]
 name = "dnspython"
 version = "2.7.0"
 description = "DNS toolkit"
@@ -397,6 +429,18 @@ doq = ["aioquic (>=1.0.0)"]
 idna = ["idna (>=3.7)"]
 trio = ["trio (>=0.23)"]
 wmi = ["wmi (>=1.5.1)"]
+
+[[package]]
+name = "dominate"
+version = "2.9.1"
+description = "Dominate is a Python library for creating and manipulating HTML documents using an elegant DOM API."
+optional = false
+python-versions = ">=3.4"
+groups = ["main"]
+files = [
+    {file = "dominate-2.9.1-py2.py3-none-any.whl", hash = "sha256:cb7b6b79d33b15ae0a6e87856b984879927c7c2ebb29522df4c75b28ffd9b989"},
+    {file = "dominate-2.9.1.tar.gz", hash = "sha256:558284687d9b8aae1904e3d6051ad132dd4a8c0cf551b37ea4e7e42a31d19dc4"},
+]
 
 [[package]]
 name = "elastic-transport"
@@ -1128,6 +1172,24 @@ files = [
 ]
 
 [[package]]
+name = "mbstrdecoder"
+version = "1.1.4"
+description = "mbstrdecoder is a Python library for multi-byte character string decoder"
+optional = false
+python-versions = ">=3.9"
+groups = ["main"]
+files = [
+    {file = "mbstrdecoder-1.1.4-py3-none-any.whl", hash = "sha256:03dae4ec50ec0d2ff4743e63fdbd5e0022815857494d35224b60775d3d934a8c"},
+    {file = "mbstrdecoder-1.1.4.tar.gz", hash = "sha256:8105ef9cf6b7d7d69fe7fd6b68a2d8f281ca9b365d7a9b670be376b2e6c81b21"},
+]
+
+[package.dependencies]
+chardet = ">=3.0.4,<6"
+
+[package.extras]
+test = ["Faker (>=1.0.2)", "pytest (>=6.0.1)", "pytest-md-report (>=0.6.2)"]
+
+[[package]]
 name = "mdurl"
 version = "0.1.2"
 description = "Markdown URL utilities"
@@ -1422,7 +1484,7 @@ version = "25.0"
 description = "Core utilities for Python packages"
 optional = false
 python-versions = ">=3.8"
-groups = ["dev"]
+groups = ["main", "dev"]
 files = [
     {file = "packaging-25.0-py3-none-any.whl", hash = "sha256:29572ef2b1f17581046b3a2227d5c611fb25ec70ca1ba8554b24b0e69331a484"},
     {file = "packaging-25.0.tar.gz", hash = "sha256:d443872c98d677bf60f6a1f2f8c1cb748e8fe762d2bf9d3148b5599295b0fc4f"},
@@ -1441,6 +1503,40 @@ files = [
 ]
 
 [[package]]
+name = "pathvalidate"
+version = "3.3.1"
+description = "pathvalidate is a Python library to sanitize/validate a string such as filenames/file-paths/etc."
+optional = false
+python-versions = ">=3.9"
+groups = ["main"]
+files = [
+    {file = "pathvalidate-3.3.1-py3-none-any.whl", hash = "sha256:5263baab691f8e1af96092fa5137ee17df5bdfbd6cff1fcac4d6ef4bc2e1735f"},
+    {file = "pathvalidate-3.3.1.tar.gz", hash = "sha256:b18c07212bfead624345bb8e1d6141cdcf15a39736994ea0b94035ad2b1ba177"},
+]
+
+[package.extras]
+docs = ["Sphinx (>=2.4)", "sphinx_rtd_theme (>=1.2.2)", "urllib3 (<2)"]
+readme = ["path (>=13,<18)", "readmemaker (>=1.2.0)"]
+test = ["Faker (>=1.0.8)", "allpairspy (>=2)", "click (>=6.2)", "pytest (>=6.0.1)", "pytest-md-report (>=0.6.2)"]
+
+[[package]]
+name = "platformdirs"
+version = "4.4.0"
+description = "A small Python package for determining appropriate platform-specific dirs, e.g. a `user data dir`."
+optional = false
+python-versions = ">=3.9"
+groups = ["main"]
+files = [
+    {file = "platformdirs-4.4.0-py3-none-any.whl", hash = "sha256:abd01743f24e5287cd7a5db3752faf1a2d65353f38ec26d98e25a6db65958c85"},
+    {file = "platformdirs-4.4.0.tar.gz", hash = "sha256:ca753cf4d81dc309bc67b0ea38fd15dc97bc30ce419a7f58d13eb3bf14c4febf"},
+]
+
+[package.extras]
+docs = ["furo (>=2024.8.6)", "proselint (>=0.14)", "sphinx (>=8.1.3)", "sphinx-autodoc-typehints (>=3)"]
+test = ["appdirs (==1.4.4)", "covdefaults (>=2.3)", "pytest (>=8.3.4)", "pytest-cov (>=6)", "pytest-mock (>=3.14)"]
+type = ["mypy (>=1.14.1)"]
+
+[[package]]
 name = "pluggy"
 version = "1.6.0"
 description = "plugin and hook calling mechanisms for python"
@@ -1455,6 +1551,24 @@ files = [
 [package.extras]
 dev = ["pre-commit", "tox"]
 testing = ["coverage", "pytest", "pytest-benchmark"]
+
+[[package]]
+name = "prettytable"
+version = "3.16.0"
+description = "A simple Python library for easily displaying tabular data in a visually appealing ASCII table format"
+optional = false
+python-versions = ">=3.9"
+groups = ["main"]
+files = [
+    {file = "prettytable-3.16.0-py3-none-any.whl", hash = "sha256:b5eccfabb82222f5aa46b798ff02a8452cf530a352c31bddfa29be41242863aa"},
+    {file = "prettytable-3.16.0.tar.gz", hash = "sha256:3c64b31719d961bf69c9a7e03d0c1e477320906a98da63952bc6698d6164ff57"},
+]
+
+[package.dependencies]
+wcwidth = "*"
+
+[package.extras]
+tests = ["pytest", "pytest-cov", "pytest-lazy-fixtures"]
 
 [[package]]
 name = "propcache"
@@ -1756,6 +1870,70 @@ docs = ["sphinx", "sphinx-rtd-theme", "zope.interface"]
 tests = ["coverage[toml] (==5.0.4)", "pytest (>=6.0.0,<7.0.0)"]
 
 [[package]]
+name = "pypistats"
+version = "1.11.0"
+description = "Python interface to PyPI Stats API https://pypistats.org/api"
+optional = false
+python-versions = ">=3.9"
+groups = ["main"]
+files = [
+    {file = "pypistats-1.11.0-py3-none-any.whl", hash = "sha256:0ecc7185098d44116e538be651c7ef781dfb6192f2103bbc9387ff05f8e1c9b3"},
+    {file = "pypistats-1.11.0.tar.gz", hash = "sha256:99059cabd3b9dc60fea8553aa03fe9c5eeca8dcb3486830f05b6cfed2f0ebf2a"},
+]
+
+[package.dependencies]
+httpx = ">=0.19"
+platformdirs = "*"
+prettytable = ">=3.12"
+pytablewriter = {version = ">=0.63", extras = ["html"]}
+python-dateutil = "*"
+python-slugify = "*"
+termcolor = ">=2.1"
+
+[package.extras]
+numpy = ["numpy"]
+pandas = ["pandas"]
+tests = ["freezegun", "pyfakefs", "pytest", "pytest-cov", "respx (>=0.11)"]
+
+[[package]]
+name = "pytablewriter"
+version = "1.2.1"
+description = "pytablewriter is a Python library to write a table in various formats: AsciiDoc / CSV / Elasticsearch / HTML / JavaScript / JSON / LaTeX / LDJSON / LTSV / Markdown / MediaWiki / NumPy / Excel / Pandas / Python / reStructuredText / SQLite / TOML / TSV / YAML."
+optional = false
+python-versions = ">=3.9"
+groups = ["main"]
+files = [
+    {file = "pytablewriter-1.2.1-py3-none-any.whl", hash = "sha256:e906ff7ff5151d70a5f66e0f7b75642a7f2dce8d893c265b79cc9cf6bc04ddb4"},
+    {file = "pytablewriter-1.2.1.tar.gz", hash = "sha256:7bd0f4f397e070e3b8a34edcf1b9257ccbb18305493d8350a5dbc9957fced959"},
+]
+
+[package.dependencies]
+DataProperty = ">=1.1.0,<2"
+dominate = {version = ">=2.1.5,<3", optional = true, markers = "extra == \"html\""}
+mbstrdecoder = ">=1.0.0,<2"
+pathvalidate = ">=2.3.0,<4"
+setuptools = ">=38.3.0"
+tabledata = ">=1.3.1,<2"
+tcolorpy = ">=0.0.5,<1"
+typepy = {version = ">=1.3.2,<2", extras = ["datetime"]}
+
+[package.extras]
+all = ["PyYAML (>=3.11,<7)", "SimpleSQLite (>=1.3.2,<2)", "XlsxWriter (>=0.9.6,<4)", "dominate (>=2.1.5,<3)", "elasticsearch (>=8.0.1,<9)", "loguru (>=0.4.1,<1)", "pandas (>=0.25.3,<3)", "pytablereader (>=0.31.3,<2)", "pytablewriter-altcol-theme (>=0.1.0,<1)", "pytablewriter-altrow-theme (>=0.2.0,<1)", "simplejson (>=3.8.1,<4)", "toml (>=0.9.3,<1)", "xlwt"]
+docs = ["PyYAML (>=3.11,<7)", "SimpleSQLite (>=1.3.2,<2)", "Sphinx (>=2.4)", "XlsxWriter (>=0.9.6,<4)", "dominate (>=2.1.5,<3)", "elasticsearch (>=8.0.1,<9)", "loguru (>=0.4.1,<1)", "pandas (>=0.25.3,<3)", "pytablereader (>=0.31.3,<2)", "pytablewriter-altcol-theme (>=0.1.0,<1)", "pytablewriter-altrow-theme (>=0.2.0,<1)", "simplejson (>=3.8.1,<4)", "sphinx_rtd_theme (>=1.2.2)", "toml (>=0.9.3,<1)", "xlwt"]
+es = ["elasticsearch (>=8.0.1,<9)"]
+es8 = ["elasticsearch (>=8.0.1,<9)"]
+excel = ["XlsxWriter (>=0.9.6,<4)", "xlwt"]
+from = ["pytablereader (>=0.31.3,<2)"]
+html = ["dominate (>=2.1.5,<3)"]
+logging = ["loguru (>=0.4.1,<1)"]
+pandas = ["pandas (>=0.25.3,<3)"]
+sqlite = ["SimpleSQLite (>=1.3.2,<2)"]
+test = ["PyYAML (>=3.11,<7)", "SimpleSQLite (>=1.3.2,<2)", "XlsxWriter (>=0.9.6,<4)", "beautifulsoup4 (>=4.10)", "dominate (>=2.1.5,<3)", "elasticsearch (>=8.0.1,<9)", "loguru (>=0.4.1,<1)", "pandas (>=0.25.3,<3)", "pytablereader (>=0.31.3,<2)", "pytablereader[excel,sqlite] (>=0.31.3)", "pytablewriter-altcol-theme (>=0.1.0,<1)", "pytablewriter-altrow-theme (>=0.2.0,<1)", "pytest (>=6.0.1)", "pytest-md-report (>=0.6.2)", "simplejson (>=3.8.1,<4)", "sqliteschema (>=2)", "tablib (>=3.2.0)", "toml (>=0.9.3,<1)", "xlwt"]
+theme = ["pytablewriter-altcol-theme (>=0.1.0,<1)", "pytablewriter-altrow-theme (>=0.2.0,<1)"]
+toml = ["toml (>=0.9.3,<1)"]
+yaml = ["PyYAML (>=3.11,<7)"]
+
+[[package]]
 name = "pytest"
 version = "8.4.1"
 description = "pytest: simple powerful testing with Python"
@@ -1836,6 +2014,36 @@ groups = ["main"]
 files = [
     {file = "python_multipart-0.0.20-py3-none-any.whl", hash = "sha256:8a62d3a8335e06589fe01f2a3e178cdcc632f3fbe0d492ad9ee0ec35aab1f104"},
     {file = "python_multipart-0.0.20.tar.gz", hash = "sha256:8dd0cab45b8e23064ae09147625994d090fa46f5b0d1e13af944c331a7fa9d13"},
+]
+
+[[package]]
+name = "python-slugify"
+version = "8.0.4"
+description = "A Python slugify application that also handles Unicode"
+optional = false
+python-versions = ">=3.7"
+groups = ["main"]
+files = [
+    {file = "python-slugify-8.0.4.tar.gz", hash = "sha256:59202371d1d05b54a9e7720c5e038f928f45daaffe41dd10822f3907b937c856"},
+    {file = "python_slugify-8.0.4-py2.py3-none-any.whl", hash = "sha256:276540b79961052b66b7d116620b36518847f52d5fd9e3a70164fc8c50faa6b8"},
+]
+
+[package.dependencies]
+text-unidecode = ">=1.3"
+
+[package.extras]
+unidecode = ["Unidecode (>=1.1.1)"]
+
+[[package]]
+name = "pytz"
+version = "2025.2"
+description = "World timezone definitions, modern and historical"
+optional = false
+python-versions = "*"
+groups = ["main"]
+files = [
+    {file = "pytz-2025.2-py2.py3-none-any.whl", hash = "sha256:5ddf76296dd8c44c26eb8f4b6f35488f3ccbf6fbbd7adee0b7262d43f0ec2f00"},
+    {file = "pytz-2025.2.tar.gz", hash = "sha256:360b9e3dbb49a209c21ad61809c7fb453643e048b38924c765813546746e81c3"},
 ]
 
 [[package]]
@@ -1998,6 +2206,27 @@ files = [
 ]
 
 [[package]]
+name = "setuptools"
+version = "80.9.0"
+description = "Easily download, build, install, upgrade, and uninstall Python packages"
+optional = false
+python-versions = ">=3.9"
+groups = ["main"]
+files = [
+    {file = "setuptools-80.9.0-py3-none-any.whl", hash = "sha256:062d34222ad13e0cc312a4c02d73f059e86a4acbfbdea8f8f76b28c99f306922"},
+    {file = "setuptools-80.9.0.tar.gz", hash = "sha256:f36b47402ecde768dbfafc46e8e4207b4360c654f1f3bb84475f0a28628fb19c"},
+]
+
+[package.extras]
+check = ["pytest-checkdocs (>=2.4)", "pytest-ruff (>=0.2.1) ; sys_platform != \"cygwin\"", "ruff (>=0.8.0) ; sys_platform != \"cygwin\""]
+core = ["importlib_metadata (>=6) ; python_version < \"3.10\"", "jaraco.functools (>=4)", "jaraco.text (>=3.7)", "more_itertools", "more_itertools (>=8.8)", "packaging (>=24.2)", "platformdirs (>=4.2.2)", "tomli (>=2.0.1) ; python_version < \"3.11\"", "wheel (>=0.43.0)"]
+cover = ["pytest-cov"]
+doc = ["furo", "jaraco.packaging (>=9.3)", "jaraco.tidelift (>=1.4)", "pygments-github-lexers (==0.0.5)", "pyproject-hooks (!=1.1)", "rst.linker (>=1.9)", "sphinx (>=3.5)", "sphinx-favicon", "sphinx-inline-tabs", "sphinx-lint", "sphinx-notfound-page (>=1,<2)", "sphinx-reredirects", "sphinxcontrib-towncrier", "towncrier (<24.7)"]
+enabler = ["pytest-enabler (>=2.2)"]
+test = ["build[virtualenv] (>=1.0.3)", "filelock (>=3.4.0)", "ini2toml[lite] (>=0.14)", "jaraco.develop (>=7.21) ; python_version >= \"3.9\" and sys_platform != \"cygwin\"", "jaraco.envs (>=2.2)", "jaraco.path (>=3.7.2)", "jaraco.test (>=5.5)", "packaging (>=24.2)", "pip (>=19.1)", "pyproject-hooks (!=1.1)", "pytest (>=6,!=8.1.*)", "pytest-home (>=0.5)", "pytest-perf ; sys_platform != \"cygwin\"", "pytest-subprocess", "pytest-timeout", "pytest-xdist (>=3)", "tomli-w (>=1.0.0)", "virtualenv (>=13.0.0)", "wheel (>=0.44.0)"]
+type = ["importlib_metadata (>=7.0.2) ; python_version < \"3.10\"", "jaraco.develop (>=7.21) ; sys_platform != \"cygwin\"", "mypy (==1.14.*)", "pytest-mypy"]
+
+[[package]]
 name = "shellingham"
 version = "1.5.4"
 description = "Tool to Detect Surrounding Shell"
@@ -2143,6 +2372,90 @@ typing-extensions = {version = ">=4.10.0", markers = "python_version < \"3.13\""
 
 [package.extras]
 full = ["httpx (>=0.27.0,<0.29.0)", "itsdangerous", "jinja2", "python-multipart (>=0.0.18)", "pyyaml"]
+
+[[package]]
+name = "tabledata"
+version = "1.3.4"
+description = "tabledata is a Python library to represent tabular data. Used for pytablewriter/pytablereader/SimpleSQLite/etc."
+optional = false
+python-versions = ">=3.9"
+groups = ["main"]
+files = [
+    {file = "tabledata-1.3.4-py3-none-any.whl", hash = "sha256:1f56e433bfdeb89f4487abfa48c4603a3b07c5d3a3c7e05ff73dd018c24bd0d4"},
+    {file = "tabledata-1.3.4.tar.gz", hash = "sha256:e9649cab129d718f3bff4150083b77f8a78c30f6634a30caf692b10fdc60cb97"},
+]
+
+[package.dependencies]
+DataProperty = ">=1.0.1,<2"
+typepy = ">=1.2.0,<2"
+
+[package.extras]
+logging = ["loguru (>=0.4.1,<1)"]
+test = ["pytablewriter (>=0.46)", "pytest"]
+
+[[package]]
+name = "tcolorpy"
+version = "0.1.7"
+description = "tcolopy is a Python library to apply true color for terminal text."
+optional = false
+python-versions = ">=3.9"
+groups = ["main"]
+files = [
+    {file = "tcolorpy-0.1.7-py3-none-any.whl", hash = "sha256:26a59d52027e175a37e0aba72efc99dda43f074db71f55b316d3de37d3251378"},
+    {file = "tcolorpy-0.1.7.tar.gz", hash = "sha256:0fbf6bf238890bbc2e32662aa25736769a29bf6d880328f310c910a327632614"},
+]
+
+[package.extras]
+test = ["pytest (>=6.0.1)", "pytest-md-report (>=0.6.2)"]
+
+[[package]]
+name = "termcolor"
+version = "3.1.0"
+description = "ANSI color formatting for output in terminal"
+optional = false
+python-versions = ">=3.9"
+groups = ["main"]
+files = [
+    {file = "termcolor-3.1.0-py3-none-any.whl", hash = "sha256:591dd26b5c2ce03b9e43f391264626557873ce1d379019786f99b0c2bee140aa"},
+    {file = "termcolor-3.1.0.tar.gz", hash = "sha256:6a6dd7fbee581909eeec6a756cff1d7f7c376063b14e4a298dc4980309e55970"},
+]
+
+[package.extras]
+tests = ["pytest", "pytest-cov"]
+
+[[package]]
+name = "text-unidecode"
+version = "1.3"
+description = "The most basic Text::Unidecode port"
+optional = false
+python-versions = "*"
+groups = ["main"]
+files = [
+    {file = "text-unidecode-1.3.tar.gz", hash = "sha256:bad6603bb14d279193107714b288be206cac565dfa49aa5b105294dd5c4aab93"},
+    {file = "text_unidecode-1.3-py2.py3-none-any.whl", hash = "sha256:1311f10e8b895935241623731c2ba64f4c455287888b18189350b67134a822e8"},
+]
+
+[[package]]
+name = "typepy"
+version = "1.3.4"
+description = "typepy is a Python library for variable type checker/validator/converter at a run time."
+optional = false
+python-versions = ">=3.9"
+groups = ["main"]
+files = [
+    {file = "typepy-1.3.4-py3-none-any.whl", hash = "sha256:d5ed3e0c7f49521bff0603dd08cf8d453371cf68d65a29d3d0038552ccc46e2e"},
+    {file = "typepy-1.3.4.tar.gz", hash = "sha256:89c1f66de6c6133209c43a94d23431d320ba03ef5db18f241091ea594035d9de"},
+]
+
+[package.dependencies]
+mbstrdecoder = ">=1.0.0,<2"
+packaging = {version = "*", optional = true, markers = "extra == \"datetime\""}
+python-dateutil = {version = ">=2.8.0,<3.0.0", optional = true, markers = "extra == \"datetime\""}
+pytz = {version = ">=2018.9", optional = true, markers = "extra == \"datetime\""}
+
+[package.extras]
+datetime = ["packaging", "python-dateutil (>=2.8.0,<3.0.0)", "pytz (>=2018.9)"]
+test = ["packaging", "pytest (>=6.0.1)", "python-dateutil (>=2.8.0,<3.0.0)", "pytz (>=2018.9)", "tcolorpy"]
 
 [[package]]
 name = "typer"
@@ -2406,6 +2719,18 @@ files = [
 anyio = ">=3.0.0"
 
 [[package]]
+name = "wcwidth"
+version = "0.2.13"
+description = "Measures the displayed width of unicode strings in a terminal"
+optional = false
+python-versions = "*"
+groups = ["main"]
+files = [
+    {file = "wcwidth-0.2.13-py2.py3-none-any.whl", hash = "sha256:3da69048e4540d84af32131829ff948f1e022c1c6bdb8d6102117aac784f6859"},
+    {file = "wcwidth-0.2.13.tar.gz", hash = "sha256:72ea0c06399eb286d978fdedb6923a9eb47e1c486ce63e9b4e64fc18303972b5"},
+]
+
+[[package]]
 name = "websockets"
 version = "15.0.1"
 description = "An implementation of the WebSocket Protocol (RFC 6455 & 7692)"
@@ -2606,4 +2931,4 @@ propcache = ">=0.2.1"
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.12,<4"
-content-hash = "f5fb26ee03209ca27aaaabfdcceed04fa5b7a9754c3f1d73999ae57ce36d8f24"
+content-hash = "1cd10f444b291b2cbd2e887ce97627312e9635ec21e0bcb9dde80e8fddb2710e"
