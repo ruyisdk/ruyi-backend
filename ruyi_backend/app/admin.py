@@ -1,4 +1,6 @@
 import datetime
+import sys
+import traceback
 
 from fastapi import APIRouter
 from sqlalchemy.sql.expression import select
@@ -80,8 +82,10 @@ async def admin_process_telemetry(
     try:
         async with main_db.connect() as conn:
             await crunch_and_cache_dashboard_numbers(conn, es, cache)
-    except Exception:
-        pass
+    except Exception as e:
+        # ignore cache errors
+        traceback.print_exception(e, file=sys.stderr)
+        print("Failed to cache dashboard data; ignoring", file=sys.stderr)
 
 
 @router.post("/refresh-github-stats-v1", status_code=204)
@@ -107,8 +111,10 @@ async def admin_refresh_github_stats(
     try:
         async with db.connect() as conn:
             await crunch_and_cache_dashboard_numbers(conn, es, cache)
-    except Exception:
-        pass
+    except Exception as e:
+        # ignore cache errors
+        traceback.print_exception(e, file=sys.stderr)
+        print("Failed to cache dashboard data; ignoring", file=sys.stderr)
 
 
 @router.post("/refresh-pypi-stats-v1", status_code=204)
@@ -141,8 +147,10 @@ async def admin_refresh_pypi_stats(
     try:
         async with db.connect() as conn:
             await crunch_and_cache_dashboard_numbers(conn, es, cache)
-    except Exception:
-        pass
+    except Exception as e:
+        # ignore cache errors
+        traceback.print_exception(e, file=sys.stderr)
+        print("Failed to cache dashboard data; ignoring", file=sys.stderr)
 
 
 @router.post("/refresh-repo-news-v1", status_code=204)
