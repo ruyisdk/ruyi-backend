@@ -110,9 +110,12 @@ async def crunch_and_cache_dashboard_numbers(
         total=sum(v.total for k, v in categories.items() if k.startswith("ide:")),
     )
     other_categories = categories.copy()
+    keys_to_remove = []
     for k in other_categories:
         if k.startswith("pm:") or k.startswith("ide:") or k == "pkg":
-            del other_categories[k]
+            keys_to_remove.append(k)
+    for k in keys_to_remove:
+        del other_categories[k]
     other_categories["ide"] = ide_downloads
 
     # count total installations
