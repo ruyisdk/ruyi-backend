@@ -27,12 +27,19 @@ class GitHubConfig(BaseModel):
     user_agent: str = ""
 
     ruyi_backend_repo: str = "ruyisdk/ruyi-backend"
+    ruyi_ide_eclipse_repo: str = "ruyisdk/ruyisdk-eclipse-plugins"
     ruyi_packages_index_repo: str = "ruyisdk/packages-index"
     ruyi_pm_repo: str = "ruyisdk/ruyi"
 
     def model_post_init(self, context: Any) -> None:
         super().model_post_init(context)
         self.user_agent = self.user_agent or self.ruyi_backend_repo
+
+
+class PyPIConfig(BaseModel):
+    """Configuration for PyPI access."""
+
+    ruyi_pm_package: str = "ruyi"
 
 
 class HTTPConfig(BaseModel):
@@ -76,6 +83,7 @@ class EnvConfig(BaseSettings, case_sensitive=False):
     es_main: ESConfig = ESConfig()
     github: GitHubConfig = GitHubConfig()
     http: HTTPConfig = HTTPConfig()
+    pypi: PyPIConfig = PyPIConfig()
 
 
 _ENV_CONFIG: EnvConfig | None = None

@@ -55,6 +55,9 @@ KEY_TELEMETRY_DATA_LAST_PROCESSED = "telemetry:last-processed"
 KEY_GITHUB_RELEASE_STATS = "github:release-stats"
 """GitHub release stats data."""
 
+KEY_GITHUB_RELEASE_STATS_RUYI_IDE_ECLIPSE = "github:release-stats:ruyi-ide-eclipse"
+"""GitHub release stats data for RuyiSDK IDE Eclipse plugins."""
+
 KEY_FRONTEND_DASHBOARD = "frontend:dashboard"
 """Frontend dashboard data."""
 
@@ -63,3 +66,6 @@ KEY_PREFIX_NEWS_ITEM_CONTENT = "news:item:content:"
 
 KEY_PREFIX_NEWS_ITEM_HASH = "news:item:hash:"
 """Prefix for cached content hashes of news items."""
+
+KEY_PYPI_DOWNLOAD_TOTAL_PM = "pypi:download-total:pm"
+"""Total PyPI download count of the RuyiSDK Package Manager."""
