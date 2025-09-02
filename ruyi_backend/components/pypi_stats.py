@@ -1,4 +1,5 @@
 import datetime
+import decimal
 from typing import TypedDict, TypeGuard
 
 import aiohttp
@@ -55,7 +56,7 @@ def _is_pypi_stats_response(obj: object) -> TypeGuard[PyPIStatsResponse]:
 
 
 async def _query_overall(package_name: str) -> list[PyPIStatsDataPoint]:
-    url = f'{PYPISTATS_API_BASE_URL}packages/{package_name}/overall'
+    url = f"{PYPISTATS_API_BASE_URL}packages/{package_name}/overall"
     async with aiohttp.ClientSession() as sess:
         async with sess.get(url, params={"mirrors": "false"}) as resp:
             obj = await resp.json()
@@ -133,4 +134,14 @@ async def sum_pypi_download_stats(
             < datetime.datetime(date_end.year, date_end.month, date_end.day),
         )
     )
-    return total or 0
+
+    if not total:
+        return 0
+    elif isinstance(total, int):
+        return total
+    elif isinstance(total, decimal.Decimal):
+        return int(total)
+    else:
+        raise ValueError(
+            f"Unexpected type of total download count: {type(total)} (repr {total:!r})"
+        )
