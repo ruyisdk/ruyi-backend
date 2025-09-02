@@ -1,5 +1,7 @@
 from asyncio import gather
 import datetime
+import sys
+import traceback
 from typing import cast
 
 from elasticsearch import AsyncElasticsearch
@@ -165,8 +167,9 @@ async def crunch_and_cache_dashboard_numbers(
     # cache the result
     try:
         await cache.set(KEY_FRONTEND_DASHBOARD, result.model_dump())
-    except Exception:
+    except Exception as e:
         # ignore cache errors
-        pass
+        traceback.print_exception(e, file=sys.stderr)
+        print("Failed to cache dashboard data; ignoring", file=sys.stderr)
 
     return result
