@@ -12,6 +12,7 @@ jobs:
         uses: christophebedard/dco-check@0.5.0
         with:
           python-version: '3.12'
-          args: '--verbose'
+          args: |
+            --verbose -p '^\d+\+.*\[bot\]@users\.noreply\.github\.com$'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
