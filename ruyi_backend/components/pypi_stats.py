@@ -108,10 +108,12 @@ async def persist_pypi_download_stats(
     if not buf:
         return
 
-    await conn.execute(
-        download_stats_daily_pypi.insert().prefix_with("IGNORE"),
-        buf,
-    )
+    async with conn.begin() as txn:
+        await conn.execute(
+            download_stats_daily_pypi.insert().prefix_with("IGNORE"),
+            buf,
+        )
+        await txn.commit()
 
 
 async def sum_pypi_download_stats(
