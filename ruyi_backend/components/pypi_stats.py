@@ -1,13 +1,13 @@
-import asyncio
 import datetime
-import json
 from typing import TypedDict, TypeGuard
 
-import pypistats
+import aiohttp
 from sqlalchemy.ext.asyncio import AsyncConnection
 from sqlalchemy.sql.expression import func, select
 
 from ..db.schema import ModelDownloadStatsDailyPyPI, download_stats_daily_pypi
+
+PYPISTATS_API_BASE_URL = "https://pypistats.org/api/"
 
 
 class PyPIStatsDataPoint(TypedDict):
@@ -54,20 +54,11 @@ def _is_pypi_stats_response(obj: object) -> TypeGuard[PyPIStatsResponse]:
     return True
 
 
-def _query_overall_sync(package_name: str) -> list[PyPIStatsDataPoint]:
-    s = pypistats.overall(
-        package_name,
-        mirrors=False,
-        total="daily",
-        format="json",
-    )
-    obj: object
-    if isinstance(s, str):
-        obj = json.loads(s)
-    elif isinstance(s, dict):
-        obj = s
-    else:
-        raise ValueError("Unexpected return type from pypistats.overall")
+async def _query_overall(package_name: str) -> list[PyPIStatsDataPoint]:
+    url = f'{PYPISTATS_API_BASE_URL}packages/{package_name}/overall'
+    async with aiohttp.ClientSession() as sess:
+        async with sess.get(url, params={"mirrors": "false"}) as resp:
+            obj = await resp.json()
 
     if not _is_pypi_stats_response(obj):
         raise ValueError("Unexpected response format of pypistats")
@@ -83,9 +74,7 @@ async def fetch_pypi_download_stats(
     Returns a dictionary containing daily download stats keyed by date.
     """
 
-    loop = asyncio.get_running_loop()
-
-    stats = await loop.run_in_executor(None, _query_overall_sync, package_name)
+    stats = await _query_overall(package_name)
     result = {}
     for p in stats:
         dt = datetime.datetime.strptime(p["date"], "%Y-%m-%d").date()
