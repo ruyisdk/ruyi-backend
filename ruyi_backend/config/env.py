@@ -1,8 +1,27 @@
+import functools
 from typing import Annotated, Any, TypeAlias
 
 from fastapi import Depends
 from pydantic import BaseModel
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+
+class AuthCredConfig(BaseModel):
+    """Credential for a user."""
+
+    name: str = ""
+    psw_hash: str = ""
+
+
+class AuthConfig(BaseModel):
+    """Configuration for authentication."""
+
+    admins: list[AuthCredConfig] = []
+    site_secret: str = ""
+
+    @functools.cached_property
+    def admins_by_name(self) -> dict[str, AuthCredConfig]:
+        return {ac.name: ac for ac in self.admins}
 
 
 class DBConfig(BaseModel):
@@ -77,6 +96,7 @@ class EnvConfig(BaseSettings, case_sensitive=False):
         nested_model_default_partial_update=True,
     )
     debug: bool = False
+    auth: AuthConfig = AuthConfig()
     cache_main: RedisConfig = RedisConfig()
     cli: CLIConfig = CLIConfig()
     db_main: DBConfig = DBConfig()
