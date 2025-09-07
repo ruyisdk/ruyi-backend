@@ -17,11 +17,20 @@ class AuthConfig(BaseModel):
     """Configuration for authentication."""
 
     admins: list[AuthCredConfig] = []
+    """Site administrators able to perform privileged actions."""
+
+    devs: list[AuthCredConfig] = []
+    """Developers allowed to access the FastAPI documentation endpoints."""
+
     site_secret: str = ""
 
     @functools.cached_property
     def admins_by_name(self) -> dict[str, AuthCredConfig]:
         return {ac.name: ac for ac in self.admins}
+
+    @functools.cached_property
+    def devs_by_name(self) -> dict[str, AuthCredConfig]:
+        return {ac.name: ac for ac in self.devs}
 
 
 class DBConfig(BaseModel):

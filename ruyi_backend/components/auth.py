@@ -6,19 +6,26 @@ from os import GRND_RANDOM, getrandom
 from typing import Annotated, TypeAlias
 
 from fastapi import Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from fastapi.security import (
+    HTTPBasic,
+    HTTPBasicCredentials,
+    OAuth2PasswordBearer,
+    OAuth2PasswordRequestForm,
+)
 import jwt
 from pydantic import BaseModel, ConfigDict, Field
 
 from ..config.env import DIEnvConfig
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="oauth2/token")
+http_basic = HTTPBasic()
 
 JWT_ALGORITHM = "HS256"
 JWT_EXPIRATION_SECONDS = 3600 * 1  # 1 hour
 
 JWT_PRIVATE_CLAIM_PREFIX = "https://ruyisdk.org/jwt/"
 JWT_CLAIM_IS_ADMIN = JWT_PRIVATE_CLAIM_PREFIX + "is_admin"
+JWT_CLAIM_IS_DEV = JWT_PRIVATE_CLAIM_PREFIX + "is_dev"
 
 
 def check_password(psw_hash: str, password: str) -> bool:
@@ -49,6 +56,7 @@ def gen_password_hash(password: str, salt: bytes | None = None) -> str:
 class User(BaseModel):
     username: str
     is_admin: bool
+    is_dev: bool
 
 
 class Token(BaseModel):
@@ -65,6 +73,7 @@ class TokenData(BaseModel):
 
     sub: str | None = None
     is_admin: Annotated[bool, Field(alias=JWT_CLAIM_IS_ADMIN)]
+    is_dev: Annotated[bool, Field(alias=JWT_CLAIM_IS_DEV)]
 
 
 def create_access_token(
@@ -101,6 +110,7 @@ def decode_token(site_secret: str, token: str) -> User | None:
     return User(
         username=username,
         is_admin=payload.get(JWT_CLAIM_IS_ADMIN, False),
+        is_dev=payload.get(JWT_CLAIM_IS_DEV, False),
     )
 
 
@@ -130,16 +140,47 @@ async def get_current_admin(
     )
 
 
+async def get_current_dev(
+    current_user: Annotated[User, Depends(get_current_user)],
+) -> User:
+    if current_user.is_dev:
+        return current_user
+
+    raise HTTPException(
+        status_code=status.HTTP_403_FORBIDDEN,
+        detail="Permission denied",
+    )
+
+
 async def check_login(
     env: DIEnvConfig,
     form: OAuth2PasswordRequestForm,
 ) -> User | None:
     if creds := env.auth.admins_by_name.get(form.username):
         if check_password(creds.psw_hash, form.password):
-            return User(username=creds.name, is_admin=True)
+            return User(username=creds.name, is_admin=True, is_dev=False)
+
+    if creds := env.auth.devs_by_name.get(form.username):
+        if check_password(creds.psw_hash, form.password):
+            return User(username=creds.name, is_admin=False, is_dev=True)
 
     return None
 
 
+async def http_basic_dev(
+    env: DIEnvConfig,
+    creds: Annotated[HTTPBasicCredentials, Depends(http_basic)],
+) -> None:
+    dev = env.auth.devs_by_name.get(creds.username)
+    if not dev or not check_password(dev.psw_hash, creds.password):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Unauthorized",
+            headers={"WWW-Authenticate": 'Basic realm="dev zone", charset="UTF-8"'},
+        )
+
+
 DIAdmin: TypeAlias = Annotated[User, Depends(get_current_admin)]
+DIBasicDev: TypeAlias = Annotated[None, Depends(http_basic_dev)]
+DIDev: TypeAlias = Annotated[User, Depends(get_current_dev)]
 DIUser: TypeAlias = Annotated[User, Depends(get_current_user)]

@@ -28,6 +28,7 @@ async def login(
                 data=TokenData(
                     sub=u.username,
                     is_admin=u.is_admin,
+                    is_dev=u.is_dev,
                 ),
             ),
             token_type="bearer",
