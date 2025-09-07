@@ -1,4 +1,5 @@
 import base64
+import datetime
 from hashlib import pbkdf2_hmac
 from hmac import compare_digest
 from os import GRND_RANDOM, getrandom
@@ -6,11 +7,15 @@ from typing import Annotated
 
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+import jwt
 from pydantic import BaseModel
 
-from ..config.env import EnvConfig
+from ..config.env import DIEnvConfig
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="oauth2/token")
+
+JWT_ALGORITHM = "HS256"
+JWT_EXPIRATION_SECONDS = 3600 * 1  # 1 hour
 
 
 def check_password(psw_hash: str, password: str) -> bool:
@@ -43,14 +48,54 @@ class User(BaseModel):
     is_admin: bool
 
 
-def fake_decode_token(token: str) -> User | None:
-    # This doesn't provide any security at all
-    # Check the next version
-    return User(username=token + "fakedecoded", is_admin=(token == "admin-token"))
+class Token(BaseModel):
+    access_token: str
+    token_type: str
 
 
-async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]) -> User:
-    if u := fake_decode_token(token):
+class TokenData(BaseModel):
+    sub: str | None = None
+
+
+def create_access_token(
+    site_secret: str,
+    data: TokenData,
+    expires_in: datetime.timedelta | None = None,
+) -> str:
+    expires_in = expires_in or datetime.timedelta(seconds=JWT_EXPIRATION_SECONDS)
+    expire = datetime.datetime.now(datetime.timezone.utc) + expires_in
+
+    to_encode = data.model_dump()
+    to_encode.update({"exp": expire})
+    return jwt.encode(
+        to_encode,
+        site_secret,
+        algorithm=JWT_ALGORITHM,
+    )
+
+
+def decode_token(site_secret: str, token: str) -> User | None:
+    try:
+        payload = jwt.decode(
+            token,
+            site_secret,
+            algorithms=[JWT_ALGORITHM],
+        )
+    except jwt.PyJWTError:
+        return None
+
+    username: str = payload.get("sub")
+    if username is None:
+        return None
+
+    return User(username=username, is_admin=True)
+
+
+async def get_current_user(
+    env: DIEnvConfig,
+    token: Annotated[str, Depends(oauth2_scheme)],
+) -> User:
+    if u := decode_token(env.auth.site_secret, token):
         return u
 
     raise HTTPException(
@@ -61,7 +106,7 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]) -> Use
 
 
 async def check_login(
-    env: EnvConfig,
+    env: DIEnvConfig,
     form: OAuth2PasswordRequestForm,
 ) -> User | None:
     if creds := env.auth.admins_by_name.get(form.username):
