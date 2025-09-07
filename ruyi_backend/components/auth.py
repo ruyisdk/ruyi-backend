@@ -142,3 +142,4 @@ async def check_login(
 
 
 DIAdmin: TypeAlias = Annotated[User, Depends(get_current_admin)]
+DIUser: TypeAlias = Annotated[User, Depends(get_current_user)]
