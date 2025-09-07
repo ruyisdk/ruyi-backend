@@ -1,0 +1,13 @@
+[Unit]
+Description=RuyiSDK Backend: Process telemetry data (hourly)
+
+[Service]
+Type=oneshot
+DynamicUser=yes
+# Change to actual values before use
+ExecStart=/usr/bin/bash /path/to/ruyi-backend/scripts/cron/ruyi-backend-process-telemetry.sh
+Environment="RUYISDK_API_HOST=https://your.ruyisdk.api.example.com"
+# These values are not urlencoded in the provided script, beware and urlencode
+# the values yourself if you happen to use such values that require escaping
+Environment="RUYISDK_API_USERNAME=foobar"
+Environment="RUYISDK_API_PASSWORD=foobar"

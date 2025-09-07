@@ -1,0 +1,8 @@
+[Unit]
+Description=RuyiSDK Backend: Process telemetry data (hourly)
+
+[Timer]
+OnCalendar=*:0
+
+[Install]
+WantedBy=timers.target
