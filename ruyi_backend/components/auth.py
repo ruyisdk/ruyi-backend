@@ -8,7 +8,7 @@ from typing import Annotated
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 import jwt
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict, Field
 
 from ..config.env import DIEnvConfig
 
@@ -16,6 +16,9 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="oauth2/token")
 
 JWT_ALGORITHM = "HS256"
 JWT_EXPIRATION_SECONDS = 3600 * 1  # 1 hour
+
+JWT_PRIVATE_CLAIM_PREFIX = "https://ruyisdk.org/jwt/"
+JWT_CLAIM_IS_ADMIN = JWT_PRIVATE_CLAIM_PREFIX + "is_admin"
 
 
 def check_password(psw_hash: str, password: str) -> bool:
@@ -54,7 +57,14 @@ class Token(BaseModel):
 
 
 class TokenData(BaseModel):
+    model_config = ConfigDict(
+        serialize_by_alias=True,
+        validate_by_alias=True,
+        validate_by_name=True,
+    )
+
     sub: str | None = None
+    is_admin: Annotated[bool, Field(alias=JWT_CLAIM_IS_ADMIN)]
 
 
 def create_access_token(
@@ -88,7 +98,10 @@ def decode_token(site_secret: str, token: str) -> User | None:
     if username is None:
         return None
 
-    return User(username=username, is_admin=True)
+    return User(
+        username=username,
+        is_admin=payload.get(JWT_CLAIM_IS_ADMIN, False),
+    )
 
 
 async def get_current_user(
@@ -102,6 +115,18 @@ async def get_current_user(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Invalid authentication credentials",
         headers={"WWW-Authenticate": "Bearer"},
+    )
+
+
+async def get_current_admin(
+    current_user: Annotated[User, Depends(get_current_user)],
+) -> User:
+    if current_user.is_admin:
+        return current_user
+
+    raise HTTPException(
+        status_code=status.HTTP_403_FORBIDDEN,
+        detail="Permission denied",
     )
 
 

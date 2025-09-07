@@ -18,7 +18,10 @@ async def login(
         return Token(
             access_token=create_access_token(
                 env.auth.site_secret,
-                data=TokenData(sub=u.username),
+                data=TokenData(
+                    sub=u.username,
+                    is_admin=u.is_admin,
+                ),
             ),
             token_type="bearer",
         )
