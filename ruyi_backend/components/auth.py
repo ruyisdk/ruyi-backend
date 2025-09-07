@@ -3,7 +3,7 @@ import datetime
 from hashlib import pbkdf2_hmac
 from hmac import compare_digest
 from os import GRND_RANDOM, getrandom
-from typing import Annotated
+from typing import Annotated, TypeAlias
 
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
@@ -139,3 +139,6 @@ async def check_login(
             return User(username=creds.name, is_admin=True)
 
     return None
+
+
+DIAdmin: TypeAlias = Annotated[User, Depends(get_current_admin)]

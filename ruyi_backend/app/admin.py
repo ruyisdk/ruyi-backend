@@ -13,6 +13,7 @@ from ..cache import (
     KEY_PYPI_DOWNLOAD_TOTAL_PM,
     KEY_TELEMETRY_DATA_LAST_PROCESSED,
 )
+from ..components.auth import DIAdmin
 from ..components.frontend_dashboard_processor import crunch_and_cache_dashboard_numbers
 from ..components.news_items import refresh_news_items
 from ..components.pypi_stats import (
@@ -39,6 +40,7 @@ async def admin_process_telemetry(
     main_db: DIMainDB,
     es: DIMainES,
     cache: DICacheStore,
+    admin: DIAdmin,
 ) -> None:
     """Processes collected raw telemetry data so far."""
 
@@ -95,6 +97,7 @@ async def admin_refresh_github_stats(
     db: DIMainDB,
     es: DIMainES,
     github: DIGitHub,
+    admin: DIAdmin,
 ) -> None:
     """Refreshes the cached GitHub stats."""
 
@@ -123,6 +126,7 @@ async def admin_refresh_pypi_stats(
     cache: DICacheStore,
     db: DIMainDB,
     es: DIMainES,
+    admin: DIAdmin,
 ) -> None:
     """Refreshes the cached PyPI stats."""
 
@@ -158,6 +162,7 @@ async def admin_refresh_repo_news(
     cfg: DIEnvConfig,
     cache: DICacheStore,
     github: DIGitHub,
+    admin: DIAdmin,
 ) -> None:
     """Refreshes the cached RuyiSDK repository news items."""
 
