@@ -135,10 +135,18 @@ async def _list_repo_contributors(
     owner: str,
     repo: str,
     page_size: int = 100,
+    *,
+    debug_lock: asyncio.Lock,
 ) -> list[str]:
+    async with debug_lock:
+        print(f"{owner}/{repo}: starting to fetch contributors")
+
     result = []
     page = 0
     while True:
+        async with debug_lock:
+            print(f"{owner}/{repo}: fetching contributors page {page}")
+
         resp = await g.rest.repos.async_list_contributors(
             owner,
             repo,
@@ -147,6 +155,9 @@ async def _list_repo_contributors(
             page=page,
         )
         contributors = resp.parsed_data
+        async with debug_lock:
+            print(f"{owner}/{repo}: fetched page {page}: {contributors}")
+
         if not contributors:
             break
 
@@ -163,6 +174,9 @@ async def _list_repo_contributors(
             result.append(f"email:{c.email}")
 
         page += 1
+
+    async with debug_lock:
+        print(f"{owner}/{repo}: successfully fetched {len(result)} contributor(s)")
 
     return result
 
@@ -181,8 +195,17 @@ async def query_org_stats(
         )
 
         data = resp["organization"]["repositories"]["nodes"]
+        debug_lock = asyncio.Lock()
         contributors = await asyncio.gather(
-            *[_list_repo_contributors(g, org, r["name"]) for r in data]
+            *[
+                _list_repo_contributors(
+                    g,
+                    org,
+                    r["name"],
+                    debug_lock=debug_lock,
+                )
+                for r in data
+            ]
         )
         for r, c in zip(data, contributors):
             repo_stats.append(
