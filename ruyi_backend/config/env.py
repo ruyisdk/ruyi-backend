@@ -54,6 +54,7 @@ class GitHubConfig(BaseModel):
     base_url: str = "https://api.github.com"
     user_agent: str = ""
 
+    ruyi_org: str = "ruyisdk"
     ruyi_backend_repo: str = "ruyisdk/ruyi-backend"
     ruyi_ide_eclipse_repo: str = "ruyisdk/ruyisdk-eclipse-plugins"
     ruyi_packages_index_repo: str = "ruyisdk/packages-index"

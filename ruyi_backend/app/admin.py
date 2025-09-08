@@ -8,6 +8,7 @@ from sqlalchemy.sql.expression import update
 
 from ..cache import (
     DICacheStore,
+    KEY_GITHUB_ORG_STATS_RUYISDK,
     KEY_GITHUB_RELEASE_STATS,
     KEY_GITHUB_RELEASE_STATS_RUYI_IDE_ECLIPSE,
     KEY_PYPI_DOWNLOAD_TOTAL_PM,
@@ -29,7 +30,7 @@ from ..es import DIMainES
 from ..gh import DIGitHub
 from ..schema.admin import ReqProcessTelemetry
 from ..schema.client_telemetry import UploadPayload
-from ..components.github_stats import query_release_downloads
+from ..components.github_stats import query_org_stats, query_release_downloads
 
 router = APIRouter(prefix="/admin")
 
@@ -109,6 +110,9 @@ async def admin_refresh_github_stats(
         cfg.github.ruyi_ide_eclipse_repo,
     )
     await cache.set(KEY_GITHUB_RELEASE_STATS_RUYI_IDE_ECLIPSE, stats_ide_eclipse)
+
+    org_stats = await query_org_stats(github, cfg.github.ruyi_org)
+    await cache.set(KEY_GITHUB_ORG_STATS_RUYISDK, org_stats)
 
     # refresh frontend dashboard numbers
     try:

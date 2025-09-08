@@ -3,6 +3,29 @@ import datetime
 from pydantic import BaseModel
 
 
+class DashboardGitHubRepoStatsV1(BaseModel):
+    name: str
+    watchers_count: int
+    forks_count: int
+    stars_count: int
+    prs_count: int
+    issues_count: int
+    # instead of a list of contributor identities, just expose the count for
+    # the dashboard for now
+    contributors_count: int
+
+
+class DashboardGitHubOrgStatsV1(BaseModel):
+    name: str
+    watchers_count: int
+    forks_count: int
+    stars_count: int
+    prs_count: int
+    issues_count: int
+    contributors_count: int
+    detail_by_repo: list[DashboardGitHubRepoStatsV1]
+
+
 class DashboardEventDetailV1(BaseModel):
     total: int
 
@@ -28,3 +51,6 @@ class DashboardDataV1(BaseModel):
     installs: DashboardEventDetailV1 | None
     top_packages: dict[str, DashboardEventDetailV1 | None]
     top_commands: dict[str, DashboardEventDetailV1 | None]
+
+    github_org_stats: list[DashboardGitHubOrgStatsV1]
+    """GitHub organization statistics."""

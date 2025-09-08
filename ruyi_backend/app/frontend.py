@@ -8,6 +8,7 @@ from ..schema.frontend import DashboardDataV1
 router = APIRouter(prefix="/fe")
 
 
+@router.get("/dashboard")
 @router.post("/dashboard")
 async def get_dashboard_data_v1(
     cache: DICacheStore,

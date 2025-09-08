@@ -5,23 +5,34 @@ import traceback
 from typing import cast
 
 from elasticsearch import AsyncElasticsearch
+from pydantic import ValidationError
 from sqlalchemy.ext.asyncio import AsyncConnection
 from sqlalchemy.sql.expression import func, select
 
 from ..cache import (
     KEY_FRONTEND_DASHBOARD,
+    KEY_GITHUB_ORG_STATS_RUYISDK,
     KEY_GITHUB_RELEASE_STATS,
     KEY_GITHUB_RELEASE_STATS_RUYI_IDE_ECLIPSE,
     KEY_PYPI_DOWNLOAD_TOTAL_PM,
     KEY_TELEMETRY_DATA_LAST_PROCESSED,
 )
 from ..cache.store import CacheStore
-from ..components.github_stats import ReleaseDownloadStats, merge_download_counts
+from ..components.github_stats import (
+    GitHubOrgStats,
+    ReleaseDownloadStats,
+    merge_download_counts,
+)
 from ..db.schema import (
     telemetry_aggregated_events,
     telemetry_installation_infos,
 )
-from ..schema.frontend import DashboardDataV1, DashboardEventDetailV1
+from ..schema.frontend import (
+    DashboardDataV1,
+    DashboardEventDetailV1,
+    DashboardGitHubOrgStatsV1,
+    DashboardGitHubRepoStatsV1,
+)
 
 
 async def crunch_and_cache_dashboard_numbers(
@@ -42,6 +53,17 @@ async def crunch_and_cache_dashboard_numbers(
     except Exception:
         # graceful degrade to something sensible
         last_updated = datetime.datetime.now(datetime.timezone.utc)
+
+    gh_org_stats: list[DashboardGitHubOrgStatsV1] = []
+    if cached_gh_org_stats_ruyisdk := await cache.get(KEY_GITHUB_ORG_STATS_RUYISDK):
+        try:
+            gh_org_stats_ruyisdk = GitHubOrgStats.model_validate(
+                cached_gh_org_stats_ruyisdk
+            )
+            gh_org_stats.append(_github_org_stats_for_dashboard(gh_org_stats_ruyisdk))
+        except ValidationError:
+            # ignore malformed cache entries
+            pass
 
     pm_gh_downloads = 0
     gh_stats: list[ReleaseDownloadStats] | None
@@ -165,6 +187,7 @@ async def crunch_and_cache_dashboard_numbers(
         installs=DashboardEventDetailV1(total=installation_count),
         top_packages={},  # TODO: numbers are not reported yet
         top_commands=top10_sorted_commands,
+        github_org_stats=gh_org_stats,
     )
 
     # cache the result
@@ -176,3 +199,29 @@ async def crunch_and_cache_dashboard_numbers(
         print("Failed to cache dashboard data; ignoring", file=sys.stderr)
 
     return result
+
+
+def _github_org_stats_for_dashboard(
+    stats: GitHubOrgStats,
+) -> DashboardGitHubOrgStatsV1:
+    return DashboardGitHubOrgStatsV1(
+        name=stats.name,
+        watchers_count=stats.watchers_count,
+        forks_count=stats.forks_count,
+        stars_count=stats.stars_count,
+        prs_count=stats.prs_count,
+        issues_count=stats.issues_count,
+        contributors_count=stats.contributors_count,
+        detail_by_repo=[
+            DashboardGitHubRepoStatsV1(
+                name=r.name,
+                watchers_count=r.watchers_count,
+                forks_count=r.forks_count,
+                stars_count=r.stars_count,
+                prs_count=r.prs_count,
+                issues_count=r.issues_count,
+                contributors_count=len(r.contributors),
+            )
+            for r in stats.detail_by_repo
+        ],
+    )
