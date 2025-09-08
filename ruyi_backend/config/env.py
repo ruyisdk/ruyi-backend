@@ -60,6 +60,34 @@ class GitHubConfig(BaseModel):
     ruyi_packages_index_repo: str = "ruyisdk/packages-index"
     ruyi_pm_repo: str = "ruyisdk/ruyi"
 
+    # List of repos eligible for contributor stats.
+    #
+    # Unfortunately, not all source repos are purely created by team members,
+    # and those that are disconnected forks of big projects have huge number of
+    # contributors that should not get counted under our definition of "project
+    # contributors". So we have to maintain an allowlist of repos for the
+    # stats, and maybe update it from time to time as needed.
+    eligible_repos_for_contributor_stats: list[str] = [
+        ".github",
+        "demo",
+        "docs",
+        "packages-index",
+        "revyos",
+        "ruyi",
+        "ruyi-backend",
+        "ruyibuild",
+        "ruyici",
+        "ruyi-packaging",
+        "ruyisdk",
+        "ruyisdk-eclipse-plugins",
+        "ruyisdk-overlay",
+        "ruyisdk-vscode-extension",
+        "ruyisdk-website",
+        "ruyisdk-xda",
+        "support-matrix",
+        "wechat-articles",
+    ]
+
     def model_post_init(self, context: Any) -> None:
         super().model_post_init(context)
         self.user_agent = self.user_agent or self.ruyi_backend_repo

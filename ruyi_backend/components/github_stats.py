@@ -136,8 +136,14 @@ async def _list_repo_contributors(
     repo: str,
     page_size: int = 100,
     *,
+    skip: bool,
     debug_lock: asyncio.Lock,
 ) -> list[str]:
+    if skip:
+        async with debug_lock:
+            print(f"{owner}/{repo}: skipping fetching contributors due to allowlist")
+        return []
+
     async with debug_lock:
         print(f"{owner}/{repo}: starting to fetch contributors")
 
@@ -184,8 +190,13 @@ async def _list_repo_contributors(
 async def query_org_stats(
     g: GitHub[Any],
     org: str,
+    repos_to_fetch_contributors_for: list[str] | None = None,
     page_size: int = 20,
 ) -> GitHubOrgStats:
+    if repos_to_fetch_contributors_for is None:
+        repos_to_fetch_contributors_for = []
+    set_repos_to_fetch_contributors_for = set(repos_to_fetch_contributors_for)
+
     repo_stats = []
     cursor: str | None = None
     while True:
@@ -202,6 +213,7 @@ async def query_org_stats(
                     g,
                     org,
                     r["name"],
+                    skip=r["name"] not in set_repos_to_fetch_contributors_for,
                     debug_lock=debug_lock,
                 )
                 for r in data
