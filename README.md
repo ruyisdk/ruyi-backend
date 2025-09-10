@@ -44,7 +44,7 @@ We welcome contributions to RuyiSDK! Please see our [contribution guidelines](./
 
 ## License
 
-Copyright &copy; 2024-2025 Institute of Software, Chinese Academy of Sciences (ISCAS).
+Copyright &copy; Institute of Software, Chinese Academy of Sciences (ISCAS).
 All rights reserved.
 
 `ruyi-backend` is licensed under the [Apache 2.0 license](./LICENSE-Apache.txt).
