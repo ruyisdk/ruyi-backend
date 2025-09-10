@@ -112,7 +112,7 @@ async def admin_refresh_github_stats(
     await cache.set(KEY_GITHUB_RELEASE_STATS_RUYI_IDE_ECLIPSE, stats_ide_eclipse)
 
     org_stats = await query_org_stats(github, cfg.github.ruyi_org)
-    await cache.set(KEY_GITHUB_ORG_STATS_RUYISDK, org_stats)
+    await cache.set(KEY_GITHUB_ORG_STATS_RUYISDK, org_stats.model_dump())
 
     # refresh frontend dashboard numbers
     try:
