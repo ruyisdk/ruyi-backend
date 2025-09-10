@@ -5,6 +5,8 @@ from fastapi import Depends
 from pydantic import BaseModel
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+from . import defaults
+
 
 class AuthCredConfig(BaseModel):
     """Credential for a user."""
@@ -67,26 +69,9 @@ class GitHubConfig(BaseModel):
     # contributors that should not get counted under our definition of "project
     # contributors". So we have to maintain an allowlist of repos for the
     # stats, and maybe update it from time to time as needed.
-    eligible_repos_for_contributor_stats: list[str] = [
-        ".github",
-        "demo",
-        "docs",
-        "packages-index",
-        "revyos",
-        "ruyi",
-        "ruyi-backend",
-        "ruyibuild",
-        "ruyici",
-        "ruyi-packaging",
-        "ruyisdk",
-        "ruyisdk-eclipse-plugins",
-        "ruyisdk-overlay",
-        "ruyisdk-vscode-extension",
-        "ruyisdk-website",
-        "ruyisdk-xda",
-        "support-matrix",
-        "wechat-articles",
-    ]
+    eligible_repos_for_contributor_stats: list[str] = (
+        defaults.DEFAULT_ELIGIBLE_REPOS_FOR_CONTRIBUTOR_STATS
+    )
 
     def model_post_init(self, context: Any) -> None:
         super().model_post_init(context)

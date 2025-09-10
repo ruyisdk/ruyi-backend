@@ -5,6 +5,9 @@ from typing import Any, TypedDict
 from githubkit import GitHub
 from pydantic import BaseModel
 
+from ..config.defaults import DEFAULT_ELIGIBLE_REPOS_FOR_CONTRIBUTOR_STATS
+
+
 ASSET_DOWNLOAD_STATS_GRAPHQL = """
 query AssetDownloadsStats($owner: String!, $name: String!, $cursor: String, $pageSize: Int = 50) {
   repository(owner: $owner, name: $name) {
@@ -147,7 +150,7 @@ async def _list_repo_contributors(
     async with debug_lock:
         print(f"{owner}/{repo}: starting to fetch contributors")
 
-    result = []
+    result = set()
     page = 0
     while True:
         async with debug_lock:
@@ -175,16 +178,72 @@ async def _list_repo_contributors(
             # but this is not a problem for now; we're still far from 500
             # contributors for any of our repos.
             if c.login:
-                result.append(f"github:{c.login}")
+                result.add(f"github:{c.login}")
                 continue
-            result.append(f"email:{c.email}")
+            result.add(f"email:{c.email}")
 
         page += 1
 
     async with debug_lock:
         print(f"{owner}/{repo}: successfully fetched {len(result)} contributor(s)")
 
-    return result
+    return list(sorted(result))
+
+
+async def _list_org_members(
+    g: GitHub[Any],
+    org: str,
+    page_size: int = 100,
+) -> list[str]:
+    result: set[str] = set()
+    page = 0
+    while True:
+        resp = await g.rest.orgs.async_list_members(
+            org,
+            per_page=page_size,
+            page=page,
+        )
+        if members := resp.parsed_data:
+            assert members is not None
+            for m in members:
+                if m.login:
+                    result.add(f"github:{m.login}")
+                    continue
+                result.add(f"email:{m.email}")
+            page += 1
+            continue
+        break
+    return list(sorted(result))
+
+
+async def _list_org_outside_collaborators(
+    g: GitHub[Any],
+    org: str,
+    page_size: int = 100,
+) -> list[str]:
+    # Weird... fine-grained PAT with read permission on org members still
+    # lead to 403
+    return []
+
+    result: set[str] = set()
+    page = 0
+    while True:
+        resp = await g.rest.orgs.async_list_outside_collaborators(
+            org,
+            per_page=page_size,
+            page=page,
+        )
+        if collaborators := resp.parsed_data:
+            assert collaborators is not None
+            for c in collaborators:
+                if c.login:
+                    result.add(f"github:{c.login}")
+                    continue
+                result.add(f"email:{c.email}")
+            page += 1
+            continue
+        break
+    return list(sorted(result))
 
 
 async def query_org_stats(
@@ -194,8 +253,16 @@ async def query_org_stats(
     page_size: int = 20,
 ) -> GitHubOrgStats:
     if repos_to_fetch_contributors_for is None:
-        repos_to_fetch_contributors_for = []
+        repos_to_fetch_contributors_for = DEFAULT_ELIGIBLE_REPOS_FOR_CONTRIBUTOR_STATS
     set_repos_to_fetch_contributors_for = set(repos_to_fetch_contributors_for)
+
+    # Query members and outside collaborators of the organization for merging
+    # with repo contributors.
+    org_members, org_outside_collaborators = await asyncio.gather(
+        _list_org_members(g, org),
+        _list_org_outside_collaborators(g, org),
+    )
+    org_contributors = set(org_members) | set(org_outside_collaborators)
 
     repo_stats = []
     cursor: str | None = None
@@ -232,14 +299,14 @@ async def query_org_stats(
                 )
             )
 
-        page_info = data["pageInfo"]
+        page_info = resp["organization"]["repositories"]["pageInfo"]
+        print(page_info)
         if not page_info.get("hasNextPage"):
             break
         cursor = page_info.get("endCursor")
 
-    all_contributors = set()
     for r in repo_stats:
-        all_contributors.update(r.contributors)
+        org_contributors.update(r.contributors)
 
     return GitHubOrgStats(
         name=org,
@@ -248,6 +315,6 @@ async def query_org_stats(
         stars_count=sum(r.stars_count for r in repo_stats),
         prs_count=sum(r.prs_count for r in repo_stats),
         issues_count=sum(r.issues_count for r in repo_stats),
-        contributors_count=len(all_contributors),
+        contributors_count=len(org_contributors),
         detail_by_repo=repo_stats,
     )
