@@ -18,7 +18,7 @@ RUN --mount=type=cache,target=$POETRY_CACHE_DIR poetry install --without dev --n
 FROM python:3.13-alpine3.21
 
 # for running tools and debugging
-RUN apk add --no-cache mariadb rsync valkey
+RUN apk add --no-cache mariadb rsync valkey bash jq
 
 ENV VIRTUAL_ENV=/app/.venv \
     PATH="/app/.venv/bin:$PATH"
