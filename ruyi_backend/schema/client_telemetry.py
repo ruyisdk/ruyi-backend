@@ -44,8 +44,16 @@ class UploadPayload(BaseModel):
     fmt: PositiveInt
     nonce: str
     ruyi_version: str
+
+    report_uuid: UUID | None = Field(default=None)
+    """Optional field in case the client wishes to report this, and nothing
+    else. If `installation` is present, this field is ignored."""
+
     installation: NodeInfo | None = Field(default=None)
-    events: list[AggregatedTelemetryEvent]
+    """More detailed installation info that the client has user consent to report."""
+
+    events: list[AggregatedTelemetryEvent] = Field(default=[])
+    """Aggregated telemetry events that the client has user consent to upload."""
 
 
 AggregateKey: TypeAlias = tuple[tuple[str, str], ...]

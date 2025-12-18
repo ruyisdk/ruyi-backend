@@ -20,14 +20,21 @@ async def telemetry_pm_upload_v1(payload: UploadPayload, main_db: DIMainDB) -> N
         )
 
         # Record payload.installation into telemetry_raw_installation_infos
+        report_uuid = payload.report_uuid
+        ins_info_json = "{}"
         if ins := payload.installation:
+            report_uuid = ins.report_uuid
+            ins_info_json = ins.model_dump_json()
+
+        if report_uuid is not None:
+            # Upsert the given report_uuid's installation info
             await conn.execute(
                 text(
-                    "INSERT IGNORE INTO `telemetry_raw_installation_infos` (`report_uuid`, `raw`) VALUES (:report_uuid, :raw)"
+                    "INSERT INTO `telemetry_raw_installation_infos` (`report_uuid`, `raw`) VALUES (:report_uuid, :raw) ON DUPLICATE KEY UPDATE `raw` = :raw"
                 ),
                 {
-                    "report_uuid": ins.report_uuid,
-                    "raw": ins.model_dump_json(),
+                    "report_uuid": report_uuid,
+                    "raw": ins_info_json,
                 },
             )
 
