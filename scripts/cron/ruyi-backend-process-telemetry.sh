@@ -40,6 +40,7 @@ curl "$RUYISDK_API_HOST"/admin/refresh-repo-news-v1 \
 	--data-raw '{}'
 
 hour="$(date +%H)"
+hour="${hour//0}"  # test(1) cannot handle 08 (seems treated as invalid octal)
 if [[ $hour -eq 8 ]]; then
 	curl "$RUYISDK_API_HOST"/admin/refresh-pypi-stats-v1 \
 		"${common_args[@]}" \
