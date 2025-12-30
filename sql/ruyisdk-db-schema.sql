@@ -44,7 +44,7 @@ CREATE TABLE `telemetry_riscv_machine_infos` (
     `id` BIGINT(20) AUTO_INCREMENT PRIMARY KEY,
     `model_name` VARCHAR(255) NOT NULL COMMENT 'The model name of the RISC-V machine',
     `cpu_count` INT NOT NULL COMMENT 'The number of CPUs in the machine',
-    `isa` VARCHAR(255) NOT NULL COMMENT 'The ISA string of the machine',
+    `isa` VARCHAR(1024) NOT NULL COMMENT 'The ISA string of the machine',
     `uarch` VARCHAR(255) NOT NULL COMMENT 'The microarchitecture of the machine from /proc/cpuinfo',
     `uarch_csr` VARCHAR(255) NOT NULL COMMENT 'The uarch CSR values of the machine, "{mvendorid:x}:{marchid:x}:{mimpid:x}" or "unknown"',
     `mmu` VARCHAR(255) NOT NULL COMMENT 'The MMU characteristic of the machine from /proc/cpuinfo, "svXX" or "unknown"',

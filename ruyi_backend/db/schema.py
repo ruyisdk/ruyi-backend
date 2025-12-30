@@ -129,7 +129,7 @@ telemetry_riscv_machine_infos = Table(
     Column("id", BIGINT(), primary_key=True, autoincrement=True),
     Column("model_name", VARCHAR(255), nullable=False),
     Column("cpu_count", INT(), nullable=False),
-    Column("isa", VARCHAR(255), nullable=False),
+    Column("isa", VARCHAR(1024), nullable=False),
     Column("uarch", VARCHAR(255), nullable=False),
     Column("uarch_csr", VARCHAR(255), nullable=False),
     Column("mmu", VARCHAR(255), nullable=False),
