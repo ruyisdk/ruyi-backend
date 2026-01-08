@@ -4,7 +4,7 @@ FROM python:3.13-alpine3.21 AS builder
 # for building asyncmy on arm64
 RUN apk add --no-cache gcc libc-dev
 
-RUN pip install --no-binary dulwich -C "--build-option=--pure" "poetry>=2.0.0"
+RUN pip install --extra-index-url https://mirror.isrc.ac.cn/ruyisdk/dist/python-wheels/simple/ --no-binary dulwich -C "--build-option=--pure" "poetry>=2.0.0"
 ENV POETRY_NO_INTERACTION=1 \
     POETRY_VIRTUALENVS_IN_PROJECT=1 \
     POETRY_VIRTUALENVS_CREATE=1 \
