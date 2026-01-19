@@ -129,9 +129,15 @@ async def crunch_and_cache_dashboard_numbers(
         "ide:eclipse:mirror": DashboardEventDetailV1(
             total=mirror_category_download_counts[3],
         ),
-        "ide:eclipse:github": DashboardEventDetailV1(total=ide_eclipse_gh_downloads),
         "ide:plugin:eclipse:mirror": DashboardEventDetailV1(
             total=mirror_category_download_counts[4],
+        ),
+        # Previously there was "ide:eclipse:github", but the RuyiSDK Eclipse IDE
+        # never got distributed on GitHub Releases; what's there is the plugin
+        # instead. So, the key was renamed to "ide:plugin:eclipse:github" to
+        # better reflect the truth.
+        "ide:plugin:eclipse:github": DashboardEventDetailV1(
+            total=ide_eclipse_gh_downloads,
         ),
         "ide:plugin:vscode:mirror": DashboardEventDetailV1(
             total=mirror_category_download_counts[5],
