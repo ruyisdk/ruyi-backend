@@ -106,7 +106,9 @@ async def crunch_and_cache_dashboard_numbers(
         query_es_count("/ruyisdk/3rdparty/*"),
         query_es_count("/ruyisdk/dist/*"),
         query_es_count("/ruyisdk/humans/*"),
-        query_es_count("/ruyisdk/ide/*"),
+        query_es_count("/ruyisdk/ide/0.0.*"),  # Eclipse IDE & plugin
+        query_es_count("/ruyisdk/ide/plugins/eclipse/*"),  # Eclipse plugin only
+        query_es_count("/ruyisdk/ide/plugins/vscode/*"),
         query_es_count("/ruyisdk/ruyi/*"),
     )
 
@@ -114,7 +116,7 @@ async def crunch_and_cache_dashboard_numbers(
         # only /ruyisdk/ruyi/ paths correspond to the RuyiSDK PM
         "pkg": DashboardEventDetailV1(total=mirror_category_download_counts[1]),
         "pm:github": DashboardEventDetailV1(total=pm_gh_downloads),
-        "pm:mirror": DashboardEventDetailV1(total=mirror_category_download_counts[4]),
+        "pm:mirror": DashboardEventDetailV1(total=mirror_category_download_counts[6]),
         "pm:pypi": DashboardEventDetailV1(total=pm_pypi_downloads),
         "3rdparty": DashboardEventDetailV1(total=mirror_category_download_counts[0]),
         "humans": DashboardEventDetailV1(total=mirror_category_download_counts[2]),
@@ -122,6 +124,12 @@ async def crunch_and_cache_dashboard_numbers(
             total=mirror_category_download_counts[3],
         ),
         "ide:eclipse:github": DashboardEventDetailV1(total=ide_eclipse_gh_downloads),
+        "ide:plugin:eclipse:mirror": DashboardEventDetailV1(
+            total=mirror_category_download_counts[4],
+        ),
+        "ide:plugin:vscode:mirror": DashboardEventDetailV1(
+            total=mirror_category_download_counts[5],
+        ),
     }
 
     # compatibility response field
