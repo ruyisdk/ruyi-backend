@@ -11,6 +11,7 @@ from ..cache import (
     KEY_GITHUB_ORG_STATS_RUYISDK,
     KEY_GITHUB_RELEASE_STATS,
     KEY_GITHUB_RELEASE_STATS_RUYI_IDE_ECLIPSE,
+    KEY_GITHUB_RELEASE_STATS_RUYI_IDE_VSCODE,
     KEY_PYPI_DOWNLOAD_TOTAL_PM,
     KEY_TELEMETRY_DATA_LAST_PROCESSED,
 )
@@ -110,6 +111,12 @@ async def admin_refresh_github_stats(
         cfg.github.ruyi_ide_eclipse_repo,
     )
     await cache.set(KEY_GITHUB_RELEASE_STATS_RUYI_IDE_ECLIPSE, stats_ide_eclipse)
+
+    stats_ide_vscode = await query_release_downloads(
+        github,
+        cfg.github.ruyi_ide_vscode_repo,
+    )
+    await cache.set(KEY_GITHUB_RELEASE_STATS_RUYI_IDE_VSCODE, stats_ide_vscode)
 
     org_stats = await query_org_stats(github, cfg.github.ruyi_org)
     await cache.set(KEY_GITHUB_ORG_STATS_RUYISDK, org_stats.model_dump())
