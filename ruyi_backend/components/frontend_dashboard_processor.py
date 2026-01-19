@@ -14,6 +14,7 @@ from ..cache import (
     KEY_GITHUB_ORG_STATS_RUYISDK,
     KEY_GITHUB_RELEASE_STATS,
     KEY_GITHUB_RELEASE_STATS_RUYI_IDE_ECLIPSE,
+    KEY_GITHUB_RELEASE_STATS_RUYI_IDE_VSCODE,
     KEY_PYPI_DOWNLOAD_TOTAL_PM,
     KEY_TELEMETRY_DATA_LAST_PROCESSED,
 )
@@ -77,6 +78,11 @@ async def crunch_and_cache_dashboard_numbers(
     ):
         ide_eclipse_gh_downloads = merge_download_counts(gh_stats_ide_eclipse)
 
+    ide_vscode_gh_downloads = 0
+    gh_stats_ide_vscode: list[ReleaseDownloadStats] | None
+    if gh_stats_ide_vscode := await cache.get(KEY_GITHUB_RELEASE_STATS_RUYI_IDE_VSCODE):
+        ide_vscode_gh_downloads = merge_download_counts(gh_stats_ide_vscode)
+
     pm_pypi_downloads = await cache.get(KEY_PYPI_DOWNLOAD_TOTAL_PM) or 0
 
     # query download counts from ES
@@ -129,6 +135,9 @@ async def crunch_and_cache_dashboard_numbers(
         ),
         "ide:plugin:vscode:mirror": DashboardEventDetailV1(
             total=mirror_category_download_counts[5],
+        ),
+        "ide:plugin:vscode:github": DashboardEventDetailV1(
+            total=ide_vscode_gh_downloads,
         ),
     }
 

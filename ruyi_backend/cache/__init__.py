@@ -61,6 +61,9 @@ KEY_GITHUB_RELEASE_STATS = "github:release-stats"
 KEY_GITHUB_RELEASE_STATS_RUYI_IDE_ECLIPSE = "github:release-stats:ruyi-ide-eclipse"
 """GitHub release stats data for RuyiSDK IDE Eclipse plugins."""
 
+KEY_GITHUB_RELEASE_STATS_RUYI_IDE_VSCODE = "github:release-stats:ruyi-ide-vscode"
+"""GitHub release stats data for RuyiSDK IDE VSCode plugins."""
+
 KEY_FRONTEND_DASHBOARD = "frontend:dashboard"
 """Frontend dashboard data."""
 
