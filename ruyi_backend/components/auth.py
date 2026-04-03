@@ -103,7 +103,7 @@ def decode_token(site_secret: str, token: str) -> User | None:
     except jwt.PyJWTError:
         return None
 
-    username: str = payload.get("sub")
+    username: str | None = payload.get("sub")
     if username is None:
         return None
 
