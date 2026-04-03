@@ -20,8 +20,8 @@ dependencies = [
   "anyio (>=4.9.0,<5.0.0)",
   "elasticsearch[async] (>=8.17.1,<9.0.0)",
   "fastapi-health (>=0.4.0, <0.5.0)",
-  "fastapi[standard-no-fastapi-cloud-cli] (>=0.121.0, <0.122.0)",
-  "githubkit (>=0.13.5,<0.14.0)",
+  "fastapi[standard-no-fastapi-cloud-cli] (>=0.135.0, <0.136.0)",
+  "githubkit (>=0.15.0,<0.16.0)",
   "msgpack (>=1.1.0,<2.0.0)",
   "msgpack-types (>=0.5.0,<0.6.0)",
   "pydantic (>=2.9.2, <3.0.0)",
@@ -38,8 +38,8 @@ ruyi-backend = "ruyi_backend.cli:entrypoint"
 [tool.poetry.group.dev.dependencies]
 mypy = "^1.14.1"
 pytest = "^8.2.2"
-pytest-asyncio = "^0.26.0"
-ruff = "^0.8.1"
+pytest-asyncio = "^1.3.0"
+ruff = "^0.15.9"
 
 # test deps
 httpx = "*"

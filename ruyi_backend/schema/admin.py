@@ -8,13 +8,15 @@ class ReqProcessTelemetry(BaseModel):
 
     time_start: datetime.datetime = Field(
         # 00:00:00 yesterday
-        default_factory=lambda: datetime.datetime.now().replace(
-            hour=0,
-            minute=0,
-            second=0,
-            microsecond=0,
-        )
-        + datetime.timedelta(days=-1),
+        default_factory=lambda: (
+            datetime.datetime.now().replace(
+                hour=0,
+                minute=0,
+                second=0,
+                microsecond=0,
+            )
+            + datetime.timedelta(days=-1)
+        ),
         description="The start of the time range to process telemetry data for, inclusive.",
         examples=["2021-01-01T00:00:00+08:00"],
     )
