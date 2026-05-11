@@ -1,7 +1,9 @@
+import json
+from typing import Any
 from typing import TypeAlias
 from uuid import UUID
 
-from pydantic import BaseModel, Field, PositiveInt
+from pydantic import BaseModel, Field, PositiveInt, model_validator
 
 
 ## Start of adapted code from ruyisdk/ruyi
@@ -54,6 +56,17 @@ class UploadPayload(BaseModel):
 
     events: list[AggregatedTelemetryEvent] = Field(default=[])
     """Aggregated telemetry events that the client has user consent to upload."""
+
+    @model_validator(mode="before")
+    @classmethod
+    def parse_json_string_payload(cls, data: Any) -> Any:
+        if isinstance(data, (str, bytes, bytearray)):
+            try:
+                return json.loads(data)
+            except ValueError:
+                return data
+
+        return data
 
 
 AggregateKey: TypeAlias = tuple[tuple[str, str], ...]
