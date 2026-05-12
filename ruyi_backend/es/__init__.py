@@ -25,6 +25,9 @@ def init_main_es(cfg: DIEnvConfig) -> None:
     _MAIN_ES_CONN = AsyncElasticsearch(
         cfg.es_main.host,
         basic_auth=(username, password),
+        request_timeout=10,
+        retry_on_timeout=True,
+        max_retries=5,
     )
 
 
