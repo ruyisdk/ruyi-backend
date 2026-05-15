@@ -165,8 +165,11 @@ async def crunch_and_cache_dashboard_numbers(
 
     # count total installations
     installation_count = await db.scalar(
-        select(func.count(1)).select_from(telemetry_installation_infos),
+        select(
+            func.count(func.distinct(telemetry_installation_infos.c.report_uuid))
+        ).select_from(telemetry_installation_infos),
     )
+    installation_count = installation_count or 0
 
     # count invocations grouped by individual ruyi commands
     command_counts: dict[str, int] = {}
