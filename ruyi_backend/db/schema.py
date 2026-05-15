@@ -14,6 +14,7 @@ from sqlalchemy import (
     UUID,
     INT,
     CheckConstraint,
+    UniqueConstraint,
 )
 from sqlalchemy.sql import func
 
@@ -40,6 +41,7 @@ telemetry_raw_uploads = Table(
         "created_at", TIMESTAMP(timezone=False), server_default=func.current_timestamp()
     ),
     Column("is_processed", BOOLEAN(), nullable=False, default=False),
+    UniqueConstraint("nonce", name="idx_telemetry_raw_uploads_nonce"),
 )
 
 
@@ -76,6 +78,9 @@ telemetry_raw_installation_infos = Table(
     Column(
         "created_at", TIMESTAMP(timezone=False), server_default=func.current_timestamp()
     ),
+    UniqueConstraint(
+        "report_uuid", name="idx_telemetry_raw_installation_infos_report_uuid"
+    ),
 )
 
 
@@ -109,6 +114,7 @@ telemetry_installation_infos = Table(
     Column(
         "created_at", TIMESTAMP(timezone=False), server_default=func.current_timestamp()
     ),
+    UniqueConstraint("report_uuid", name="idx_telemetry_installation_infos_report_uuid"),
 )
 
 
