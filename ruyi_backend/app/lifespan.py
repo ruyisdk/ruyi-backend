@@ -4,6 +4,7 @@ from typing import AsyncGenerator
 from fastapi import FastAPI
 
 from ..config import get_env_config, init
+from ..db.conn import dispose_main_db
 
 
 @asynccontextmanager
@@ -17,6 +18,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         app.redoc_url = None
         app.openapi_url = None
 
-    yield
-
-    # no teardown logic for now
+    try:
+        yield
+    finally:
+        await dispose_main_db()

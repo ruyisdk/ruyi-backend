@@ -5,23 +5,39 @@ from sqlalchemy.ext.asyncio import AsyncEngine, create_async_engine
 
 from ..config.env import DIEnvConfig
 
-_DB_ENGINE: AsyncEngine | None = None
+class _MainDBState:
+    engine: AsyncEngine | None = None
+
+
+_MAIN_DB = _MainDBState()
+DB_POOL_RECYCLE_SECONDS = 30 * 60
 
 
 def get_main_db() -> AsyncEngine:
-    if _DB_ENGINE is not None:
-        return _DB_ENGINE
+    if _MAIN_DB.engine is not None:
+        return _MAIN_DB.engine
     raise RuntimeError("Main DB not initialized")
 
 
 def init_main_db(cfg: DIEnvConfig) -> None:
-    global _DB_ENGINE
-
     if cfg.db_main.dsn == "":
         # no DB (maybe we're running from the CLI)
         return
 
-    _DB_ENGINE = create_async_engine(cfg.db_main.dsn, echo=cfg.debug)
+    _MAIN_DB.engine = create_async_engine(
+        cfg.db_main.dsn,
+        echo=cfg.debug,
+        pool_pre_ping=True,
+        pool_recycle=DB_POOL_RECYCLE_SECONDS,
+    )
+
+
+async def dispose_main_db() -> None:
+    if _MAIN_DB.engine is None:
+        return
+
+    await _MAIN_DB.engine.dispose()
+    _MAIN_DB.engine = None
 
 
 DIMainDB: TypeAlias = Annotated[AsyncEngine, Depends(get_main_db)]
