@@ -28,6 +28,7 @@ def init_main_es(cfg: DIEnvConfig) -> None:
         request_timeout=10,
         retry_on_timeout=True,
         max_retries=5,
+        verify_certs=False,  # TODO: make this configurable
     )
 
 
