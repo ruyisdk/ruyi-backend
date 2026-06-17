@@ -4,7 +4,12 @@ from typing import Final, cast
 from fastapi import APIRouter, Response
 import semver
 
-from ..cache import DICacheStore, KEY_GITHUB_RELEASE_STATS
+from ..cache import (
+    DICacheStore,
+    KEY_GITHUB_RELEASE_STATS,
+    KEY_GITHUB_RELEASE_STATS_RUYI_IDE_ECLIPSE,
+    KEY_GITHUB_RELEASE_STATS_RUYI_IDE_VSCODE,
+)
 from ..config.env import DIEnvConfig
 from ..components.github_stats import ReleaseDownloadStats
 from ..components.news_items import NEWS_ITEM_NOT_FOUND, get_news_item_markdown
@@ -150,6 +155,36 @@ async def get_latest_pm_releases(
     stats = cast(list[ReleaseDownloadStats], await cache.get(KEY_GITHUB_RELEASE_STATS))
     pm_repo = cfg.github.ruyi_pm_repo
     return _get_latest_releases(stats, lambda s: _generate_download_urls(s, pm_repo))
+
+
+@router.get("/latest-ide/vscode")
+async def get_latest_ide_vscode_releases(
+    cfg: DIEnvConfig,
+    cache: DICacheStore,
+) -> LatestReleasesV1:
+    stats = cast(
+        list[ReleaseDownloadStats],
+        await cache.get(KEY_GITHUB_RELEASE_STATS_RUYI_IDE_VSCODE),
+    )
+    ide_repo = cfg.github.ruyi_ide_vscode_repo
+    return _get_latest_releases(
+        stats, lambda s: _generate_ide_download_urls(s, ide_repo, "vscode")
+    )
+
+
+@router.get("/latest-ide/eclipse")
+async def get_latest_ide_eclipse_releases(
+    cfg: DIEnvConfig,
+    cache: DICacheStore,
+) -> LatestReleasesV1:
+    stats = cast(
+        list[ReleaseDownloadStats],
+        await cache.get(KEY_GITHUB_RELEASE_STATS_RUYI_IDE_ECLIPSE),
+    )
+    ide_repo = cfg.github.ruyi_ide_eclipse_repo
+    return _get_latest_releases(
+        stats, lambda s: _generate_ide_download_urls(s, ide_repo, "eclipse")
+    )
 
 
 @router.get("/changelog/news/{tag}.json")
