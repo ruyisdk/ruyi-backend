@@ -1,13 +1,17 @@
+import datetime
 import json
 from typing import Any, List, cast
 from unittest.mock import AsyncMock
 
-from functools import partial
-
 import pytest
 
-from ruyi_backend.app.releases import _generate_download_urls, _get_latest_releases
+from ruyi_backend.app.releases import (
+    _generate_download_urls,
+    _generate_ide_download_urls,
+    _get_latest_releases,
+)
 from ruyi_backend.components.github_stats import (
+    AssetDownloadStats,
     ReleaseDownloadStats,
     query_release_downloads,
 )
@@ -129,3 +133,132 @@ async def test_query_release_downloads(mock_github_client: AsyncMock) -> None:
     assert last_release["tag"] == "0.2.0-beta.20231204"
     assert "assets" in last_release
     assert len(last_release["assets"]) == 3  # This specific release has 3 assets
+
+
+def make_ide_release_stats(
+    tag: str,
+    date: str,
+    asset_names: list[str],
+) -> ReleaseDownloadStats:
+    return ReleaseDownloadStats(
+        tag=tag,
+        date=datetime.datetime.fromisoformat(date),
+        assets=[
+            AssetDownloadStats(name=name, download_count=0) for name in asset_names
+        ],
+    )
+
+
+def test_generate_ide_download_urls_vscode() -> None:
+    ide_repo = "ruyisdk/ruyisdk-vscode-extension"
+    ide_slug = "vscode"
+    release = make_ide_release_stats(
+        "0.1.4",
+        "2025-06-01T10:00:00+00:00",
+        ["ruyisdk-vscode-extension-0.1.4.vsix"],
+    )
+    urls = _generate_ide_download_urls(release, ide_repo, ide_slug)
+    assert urls == {
+        "none/any": [
+            "https://github.com/ruyisdk/ruyisdk-vscode-extension/releases/download/"
+            "0.1.4/ruyisdk-vscode-extension-0.1.4.vsix",
+            "https://mirror.iscas.ac.cn/ruyisdk/ide/plugins/vscode/"
+            "0.1.4/ruyisdk-vscode-extension-0.1.4.vsix",
+        ],
+    }
+
+
+def test_generate_ide_download_urls_eclipse() -> None:
+    ide_repo = "ruyisdk/ruyisdk-eclipse-plugins"
+    ide_slug = "eclipse"
+    release = make_ide_release_stats(
+        "0.1.4",
+        "2025-06-01T10:00:00+00:00",
+        ["ruyisdk-eclipse-plugins-0.1.4.zip"],
+    )
+    urls = _generate_ide_download_urls(release, ide_repo, ide_slug)
+    assert urls == {
+        "none/any": [
+            "https://github.com/ruyisdk/ruyisdk-eclipse-plugins/releases/download/"
+            "0.1.4/ruyisdk-eclipse-plugins-0.1.4.zip",
+            "https://mirror.iscas.ac.cn/ruyisdk/ide/plugins/eclipse/"
+            "0.1.4/ruyisdk-eclipse-plugins-0.1.4.zip",
+        ],
+    }
+
+
+def test_generate_ide_download_urls_multiple_assets() -> None:
+    ide_repo = "ruyisdk/ruyisdk-vscode-extension"
+    ide_slug = "vscode"
+    release = make_ide_release_stats(
+        "0.1.4",
+        "2025-06-01T10:00:00+00:00",
+        [
+            "ruyisdk-vscode-extension-0.1.4.vsix",
+            "ruyisdk-vscode-extension-0.1.4.tar.gz",
+        ],
+    )
+    urls = _generate_ide_download_urls(release, ide_repo, ide_slug)
+    assert urls == {
+        "none/any": [
+            "https://github.com/ruyisdk/ruyisdk-vscode-extension/releases/download/"
+            "0.1.4/ruyisdk-vscode-extension-0.1.4.vsix",
+            "https://mirror.iscas.ac.cn/ruyisdk/ide/plugins/vscode/"
+            "0.1.4/ruyisdk-vscode-extension-0.1.4.vsix",
+            "https://github.com/ruyisdk/ruyisdk-vscode-extension/releases/download/"
+            "0.1.4/ruyisdk-vscode-extension-0.1.4.tar.gz",
+            "https://mirror.iscas.ac.cn/ruyisdk/ide/plugins/vscode/"
+            "0.1.4/ruyisdk-vscode-extension-0.1.4.tar.gz",
+        ],
+    }
+
+
+def test_get_latest_ide_releases() -> None:
+    ide_repo = "ruyisdk/ruyisdk-vscode-extension"
+    ide_slug = "vscode"
+    stats = [
+        make_ide_release_stats(
+            "0.1.4",
+            "2025-06-01T10:00:00+00:00",
+            ["ruyisdk-vscode-extension-0.1.4.vsix"],
+        ),
+        make_ide_release_stats(
+            "0.1.3",
+            "2025-05-15T10:00:00+00:00",
+            ["ruyisdk-vscode-extension-0.1.3.vsix"],
+        ),
+        make_ide_release_stats(
+            "0.1.4-beta.1",
+            "2025-05-30T10:00:00+00:00",
+            ["ruyisdk-vscode-extension-0.1.4-beta.1.vsix"],
+        ),
+    ]
+    result = _get_latest_releases(
+        stats, lambda s: _generate_ide_download_urls(s, ide_repo, ide_slug)
+    )
+    channels = result.channels
+    assert set(channels.keys()) == {"stable", "testing"}
+
+    stable = channels["stable"]
+    assert stable.version == "0.1.4"
+    assert stable.channel == "stable"
+    assert stable.download_urls == {
+        "none/any": [
+            "https://github.com/ruyisdk/ruyisdk-vscode-extension/releases/download/"
+            "0.1.4/ruyisdk-vscode-extension-0.1.4.vsix",
+            "https://mirror.iscas.ac.cn/ruyisdk/ide/plugins/vscode/"
+            "0.1.4/ruyisdk-vscode-extension-0.1.4.vsix",
+        ],
+    }
+
+    testing = channels["testing"]
+    assert testing.version == "0.1.4-beta.1"
+    assert testing.channel == "testing"
+    assert testing.download_urls == {
+        "none/any": [
+            "https://github.com/ruyisdk/ruyisdk-vscode-extension/releases/download/"
+            "0.1.4-beta.1/ruyisdk-vscode-extension-0.1.4-beta.1.vsix",
+            "https://mirror.iscas.ac.cn/ruyisdk/ide/plugins/vscode/"
+            "0.1.4-beta.1/ruyisdk-vscode-extension-0.1.4-beta.1.vsix",
+        ],
+    }
