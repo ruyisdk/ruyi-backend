@@ -77,6 +77,31 @@ def _generate_download_urls(
     }
 
 
+def _get_ide_dl_mirrors(ide_repo: str, ide_slug: str) -> list[str]:
+    """Returns a list of download mirrors for an IDE plugin."""
+
+    return [
+        f"https://github.com/{ide_repo}/releases/download/",
+        f"https://mirror.iscas.ac.cn/ruyisdk/ide/plugins/{ide_slug}/",
+    ]
+
+
+def _generate_ide_download_urls(
+    s: ReleaseDownloadStats,
+    ide_repo: str,
+    ide_slug: str,
+) -> dict[str, list[str]]:
+    """Generates download URLs for an IDE plugin release."""
+
+    ver = s["tag"]
+    mirrors = _get_ide_dl_mirrors(ide_repo, ide_slug)
+    urls: list[str] = []
+    for asset in s["assets"]:
+        name = asset["name"]
+        urls.extend(base + f"{ver}/{name}" for base in mirrors)
+    return {"none/any": urls}
+
+
 def _get_latest_releases(
     stats: list[ReleaseDownloadStats],
     url_generator: Callable[[ReleaseDownloadStats], dict[str, list[str]]],
