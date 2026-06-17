@@ -60,4 +60,6 @@ async def test_dashboard_counts_distinct_installation_report_uuids() -> None:
     assert result.installs is not None
     assert result.installs.total == 7
     install_count_sql = str(db.scalar_statements[0]).lower()
-    assert "count(distinct(telemetry_installation_infos.report_uuid))" in install_count_sql
+    assert (
+        "count(distinct(telemetry_installation_infos.report_uuid))" in install_count_sql
+    )

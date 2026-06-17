@@ -1,3 +1,4 @@
+from collections.abc import Callable
 from typing import Final, cast
 
 from fastapi import APIRouter, Response
@@ -78,7 +79,7 @@ def _generate_download_urls(
 
 def _get_latest_releases(
     stats: list[ReleaseDownloadStats],
-    pm_repo: str,
+    url_generator: Callable[[ReleaseDownloadStats], dict[str, list[str]]],
 ) -> LatestReleasesV1:
     """Returns the latest releases for each channel."""
 
@@ -110,7 +111,7 @@ def _get_latest_releases(
             version=str(v),
             channel=channel,
             release_date=release_stat["date"],
-            download_urls=_generate_download_urls(release_stat, pm_repo),
+            download_urls=url_generator(release_stat),
         )
     return LatestReleasesV1(channels=releases)
 
@@ -122,7 +123,8 @@ async def get_latest_pm_releases(
 ) -> LatestReleasesV1:
     # use the cached GitHub release stats as the data source
     stats = cast(list[ReleaseDownloadStats], await cache.get(KEY_GITHUB_RELEASE_STATS))
-    return _get_latest_releases(stats, cfg.github.ruyi_pm_repo)
+    pm_repo = cfg.github.ruyi_pm_repo
+    return _get_latest_releases(stats, lambda s: _generate_download_urls(s, pm_repo))
 
 
 @router.get("/changelog/news/{tag}.json")

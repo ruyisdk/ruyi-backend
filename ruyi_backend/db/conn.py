@@ -5,6 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncEngine, create_async_engine
 
 from ..config.env import DIEnvConfig
 
+
 class _MainDBState:
     engine: AsyncEngine | None = None
 

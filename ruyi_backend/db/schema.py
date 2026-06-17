@@ -114,7 +114,9 @@ telemetry_installation_infos = Table(
     Column(
         "created_at", TIMESTAMP(timezone=False), server_default=func.current_timestamp()
     ),
-    UniqueConstraint("report_uuid", name="idx_telemetry_installation_infos_report_uuid"),
+    UniqueConstraint(
+        "report_uuid", name="idx_telemetry_installation_infos_report_uuid"
+    ),
 )
 
 

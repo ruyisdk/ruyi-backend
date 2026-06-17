@@ -2,9 +2,11 @@ import json
 from typing import Any, List, cast
 from unittest.mock import AsyncMock
 
+from functools import partial
+
 import pytest
 
-from ruyi_backend.app.releases import _get_latest_releases
+from ruyi_backend.app.releases import _generate_download_urls, _get_latest_releases
 from ruyi_backend.components.github_stats import (
     ReleaseDownloadStats,
     query_release_downloads,
@@ -23,7 +25,10 @@ def release_stats(ruyi_file: RuyiFileFixtureFactory) -> List[ReleaseDownloadStat
 
 def test_get_latest_releases(release_stats: List[ReleaseDownloadStats]) -> None:
     stats: List[ReleaseDownloadStats] = release_stats
-    result: LatestReleasesV1 = _get_latest_releases(stats, "foo/bar")
+    pm_repo = "foo/bar"
+    result: LatestReleasesV1 = _get_latest_releases(
+        stats, lambda s: _generate_download_urls(s, pm_repo)
+    )
     channels = result.channels
     assert set(channels.keys()) == {"stable", "testing"}
 
