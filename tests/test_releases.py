@@ -3,6 +3,7 @@ import json
 from typing import Any, List, cast
 from unittest.mock import AsyncMock
 
+import msgpack
 import pytest
 
 from ruyi_backend.app.releases import (
@@ -262,3 +263,49 @@ def test_get_latest_ide_releases() -> None:
             "0.1.4-beta.1/ruyisdk-vscode-extension-0.1.4-beta.1.vsix",
         ],
     }
+
+
+# Real Eclipse plugin release data as stored in Redis (msgpack with timestamp ext).
+ECLIPSE_MSGPACK_DATA = (
+    b"\x99\x83\xa3tag\xa6v0.1.4\xa4date\xd6\xffj\x19ha\xa6assets\x91\x82"
+    b"\xa4name\xd9!ruyisdk-eclipse-plugins-0.1.4.zip\xaedownload_count\x07"
+    b"\x83\xa3tag\xaacontinuous\xa4date\xd6\xffj\x19h_\xa6assets\x91\x82"
+    b"\xa4name\xd9 ruyisdk-eclipse-plugins.site.zip\xaedownload_count\x03"
+    b"\x83\xa3tag\xa6v0.1.3\xa4date\xd6\xffi\xe9\xdc~\xa6assets\x91\x82"
+    b"\xa4name\xd9!ruyisdk-eclipse-plugins-0.1.3.zip\xaedownload_count\x06"
+    b"\x83\xa3tag\xa6v0.1.2\xa4date\xd6\xffi\x818\x0e\xa6assets\x91\x82"
+    b"\xa4name\xd9!ruyisdk-eclipse-plugins-0.1.2.zip\xaedownload_count\x06"
+    b"\x83\xa3tag\xa6v0.1.1\xa4date\xd6\xffio*\x05\xa6assets\x91\x82"
+    b"\xa4name\xd9!ruyisdk-eclipse-plugins-0.1.1.zip\xaedownload_count\x07"
+    b"\x83\xa3tag\xa6v0.1.0\xa4date\xd6\xffiS\xebF\xa6assets\x91\x82"
+    b"\xa4name\xd9!ruyisdk-eclipse-plugins-0.1.0.zip\xaedownload_count\x06"
+    b"\x83\xa3tag\xa6v0.0.6\xa4date\xd6\xffhZ[N\xa6assets\x91\x82"
+    b"\xa4name\xb9org.ruyisdk.ide_0.0.6.zip\xaedownload_count-"
+    b"\x83\xa3tag\xa6v0.0.5\xa4date\xd6\xffh5\x92i\xa6assets\x91\x82"
+    b"\xa4name\xb9org.ruyisdk.ide_0.0.5.zip\xaedownload_count\x02"
+    b"\x83\xa3tag\xa6v0.0.4\xa4date\xd6\xffh\"\xff\x13\xa6assets\x91\x82"
+    b"\xa4name\xb9org.ruyisdk.ide_0.0.4.zip\xaedownload_count\x04"
+)
+
+
+def test_latest_eclipse_with_v_prefixed_tags() -> None:
+    """Regression: _get_latest_releases must handle v-prefixed tags."""
+    stats = cast(
+        list[ReleaseDownloadStats],
+        msgpack.loads(ECLIPSE_MSGPACK_DATA, timestamp=3),
+    )
+    ide_repo = "ruyisdk/ruyisdk-eclipse-plugins"
+    result = _get_latest_releases(
+        stats, lambda s: _generate_ide_download_urls(s, ide_repo, "eclipse")
+    )
+    channels = result.channels
+    assert set(channels.keys()) == {"stable"}
+    stable = channels["stable"]
+    assert stable.version == "0.1.4"
+    assert stable.channel == "stable"
+    assert stable.download_urls["none/any"] == [
+        "https://github.com/ruyisdk/ruyisdk-eclipse-plugins/releases/download/"
+        "v0.1.4/ruyisdk-eclipse-plugins-0.1.4.zip",
+        "https://mirror.iscas.ac.cn/ruyisdk/ide/plugins/eclipse/"
+        "v0.1.4/ruyisdk-eclipse-plugins-0.1.4.zip",
+    ]

@@ -116,8 +116,9 @@ def _get_latest_releases(
     latest_versions_by_channel: dict[str, semver.Version] = {}
     for rel in stats:
         tag = rel["tag"]
+        semver_str = tag[1:] if tag.startswith("v") else tag
         try:
-            v = semver.Version.parse(tag)
+            v = semver.Version.parse(semver_str)
         except ValueError:
             continue
         channel = "testing" if v.prerelease else "stable"
@@ -131,14 +132,16 @@ def _get_latest_releases(
     releases: dict[str, ReleaseDetailV1] = {}
     for channel, v in latest_versions_by_channel.items():
         release_stat: ReleaseDownloadStats | None = None
+        ver_str = str(v)
         for rel in stats:
-            if rel["tag"] == str(v):
+            tag = rel["tag"]
+            if tag == ver_str or tag == f"v{ver_str}":
                 release_stat = rel
                 break
         assert release_stat is not None
 
         releases[channel] = ReleaseDetailV1(
-            version=str(v),
+            version=ver_str,
             channel=channel,
             release_date=release_stat["date"],
             download_urls=url_generator(release_stat),
