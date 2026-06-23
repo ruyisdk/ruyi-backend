@@ -164,7 +164,7 @@ def test_generate_ide_download_urls_vscode() -> None:
             "https://github.com/ruyisdk/ruyisdk-vscode-extension/releases/download/"
             "0.1.4/ruyisdk-vscode-extension-0.1.4.vsix",
             "https://mirror.iscas.ac.cn/ruyisdk/ide/plugins/vscode/"
-            "0.1.4/ruyisdk-vscode-extension-0.1.4.vsix",
+            "ruyisdk-vscode-extension-0.1.4.vsix",
         ],
     }
 
@@ -183,7 +183,7 @@ def test_generate_ide_download_urls_eclipse() -> None:
             "https://github.com/ruyisdk/ruyisdk-eclipse-plugins/releases/download/"
             "0.1.4/ruyisdk-eclipse-plugins-0.1.4.zip",
             "https://mirror.iscas.ac.cn/ruyisdk/ide/plugins/eclipse/"
-            "0.1.4/ruyisdk-eclipse-plugins-0.1.4.zip",
+            "ruyisdk-eclipse-plugins-0.1.4.zip",
         ],
     }
 
@@ -205,11 +205,11 @@ def test_generate_ide_download_urls_multiple_assets() -> None:
             "https://github.com/ruyisdk/ruyisdk-vscode-extension/releases/download/"
             "0.1.4/ruyisdk-vscode-extension-0.1.4.vsix",
             "https://mirror.iscas.ac.cn/ruyisdk/ide/plugins/vscode/"
-            "0.1.4/ruyisdk-vscode-extension-0.1.4.vsix",
+            "ruyisdk-vscode-extension-0.1.4.vsix",
             "https://github.com/ruyisdk/ruyisdk-vscode-extension/releases/download/"
             "0.1.4/ruyisdk-vscode-extension-0.1.4.tar.gz",
             "https://mirror.iscas.ac.cn/ruyisdk/ide/plugins/vscode/"
-            "0.1.4/ruyisdk-vscode-extension-0.1.4.tar.gz",
+            "ruyisdk-vscode-extension-0.1.4.tar.gz",
         ],
     }
 
@@ -248,7 +248,7 @@ def test_get_latest_ide_releases() -> None:
             "https://github.com/ruyisdk/ruyisdk-vscode-extension/releases/download/"
             "0.1.4/ruyisdk-vscode-extension-0.1.4.vsix",
             "https://mirror.iscas.ac.cn/ruyisdk/ide/plugins/vscode/"
-            "0.1.4/ruyisdk-vscode-extension-0.1.4.vsix",
+            "ruyisdk-vscode-extension-0.1.4.vsix",
         ],
     }
 
@@ -260,7 +260,7 @@ def test_get_latest_ide_releases() -> None:
             "https://github.com/ruyisdk/ruyisdk-vscode-extension/releases/download/"
             "0.1.4-beta.1/ruyisdk-vscode-extension-0.1.4-beta.1.vsix",
             "https://mirror.iscas.ac.cn/ruyisdk/ide/plugins/vscode/"
-            "0.1.4-beta.1/ruyisdk-vscode-extension-0.1.4-beta.1.vsix",
+            "ruyisdk-vscode-extension-0.1.4-beta.1.vsix",
         ],
     }
 
@@ -307,5 +307,5 @@ def test_latest_eclipse_with_v_prefixed_tags() -> None:
         "https://github.com/ruyisdk/ruyisdk-eclipse-plugins/releases/download/"
         "v0.1.4/ruyisdk-eclipse-plugins-0.1.4.zip",
         "https://mirror.iscas.ac.cn/ruyisdk/ide/plugins/eclipse/"
-        "v0.1.4/ruyisdk-eclipse-plugins-0.1.4.zip",
+        "ruyisdk-eclipse-plugins-0.1.4.zip",
     ]

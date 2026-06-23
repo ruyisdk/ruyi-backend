@@ -83,11 +83,13 @@ def _generate_download_urls(
 
 
 def _get_ide_dl_mirrors(ide_repo: str, ide_slug: str) -> list[str]:
-    """Returns a list of download mirrors for an IDE plugin."""
+    """Returns a list of download mirrors for an IDE plugin. They are format
+    strings ready to get interpolated."""
 
     return [
-        f"https://github.com/{ide_repo}/releases/download/",
-        f"https://mirror.iscas.ac.cn/ruyisdk/ide/plugins/{ide_slug}/",
+        f"https://github.com/{ide_repo}/releases/download/{{tag}}/{{name}}",
+        # plugin are currently stored without a tag directory in the ISCAS mirror layout
+        f"https://mirror.iscas.ac.cn/ruyisdk/ide/plugins/{ide_slug}/{{name}}",
     ]
 
 
@@ -98,12 +100,11 @@ def _generate_ide_download_urls(
 ) -> dict[str, list[str]]:
     """Generates download URLs for an IDE plugin release."""
 
+    tag = s["tag"]
     mirrors = _get_ide_dl_mirrors(ide_repo, ide_slug)
     urls: list[str] = []
     for asset in s["assets"]:
-        name = asset["name"]
-        # not f"{tag}/{name}" -- filenames are currently bare
-        urls.extend(base + name for base in mirrors)
+        urls.extend(base.format(tag=tag, name=asset["name"]) for base in mirrors)
     return {"none/any": urls}
 
 
