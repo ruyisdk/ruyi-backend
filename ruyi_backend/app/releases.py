@@ -98,12 +98,12 @@ def _generate_ide_download_urls(
 ) -> dict[str, list[str]]:
     """Generates download URLs for an IDE plugin release."""
 
-    ver = s["tag"]
     mirrors = _get_ide_dl_mirrors(ide_repo, ide_slug)
     urls: list[str] = []
     for asset in s["assets"]:
         name = asset["name"]
-        urls.extend(base + f"{ver}/{name}" for base in mirrors)
+        # not f"{tag}/{name}" -- filenames are currently bare
+        urls.extend(base + name for base in mirrors)
     return {"none/any": urls}
 
 
