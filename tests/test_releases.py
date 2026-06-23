@@ -283,7 +283,7 @@ ECLIPSE_MSGPACK_DATA = (
     b"\xa4name\xb9org.ruyisdk.ide_0.0.6.zip\xaedownload_count-"
     b"\x83\xa3tag\xa6v0.0.5\xa4date\xd6\xffh5\x92i\xa6assets\x91\x82"
     b"\xa4name\xb9org.ruyisdk.ide_0.0.5.zip\xaedownload_count\x02"
-    b"\x83\xa3tag\xa6v0.0.4\xa4date\xd6\xffh\"\xff\x13\xa6assets\x91\x82"
+    b'\x83\xa3tag\xa6v0.0.4\xa4date\xd6\xffh"\xff\x13\xa6assets\x91\x82'
     b"\xa4name\xb9org.ruyisdk.ide_0.0.4.zip\xaedownload_count\x04"
 )
 
