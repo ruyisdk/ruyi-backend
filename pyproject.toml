@@ -39,7 +39,7 @@ ruyi-backend = "ruyi_backend.cli:entrypoint"
 mypy = "^2"
 pytest = "^9"
 pytest-asyncio = "^1.3.0"
-ruff = "^0.15.9"
+ruff = "^0.15.20"
 
 # test deps
 httpx2 = "*"
