@@ -89,6 +89,7 @@ async def crunch_and_cache_dashboard_numbers(
     now = datetime.datetime.now(tz=datetime.timezone.utc)
 
     async def query_es_count(path: str) -> int:
+        print(f"querying request counts for path {path} from ES")
         resp = await es.count(
             query={
                 "bool": {
@@ -106,6 +107,7 @@ async def crunch_and_cache_dashboard_numbers(
                 }
             }
         )
+        print(f"queried request counts for path {path} from ES: {resp['count']}")
         return cast(int, resp["count"])
 
     mirror_category_download_counts = await gather(
