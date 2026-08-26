@@ -204,6 +204,64 @@ def test_generate_download_urls_darwin_aarch64() -> None:
     }
 
 
+def test_generate_download_urls_linux_prefixed_suffix() -> None:
+    # Linux onefile assets are expected to gain a "linux-" prefix later; the
+    # new naming must produce the same linux/<arch> platform keys.
+    pm_repo = "foo/bar"
+    tag = "0.60.0"
+    release = make_ide_release_stats(
+        tag,
+        "2026-09-01T00:00:00+00:00",
+        [
+            f"ruyi-{tag}.tar.gz",
+            f"ruyi-{tag}.linux-amd64",
+            f"ruyi-{tag}.linux-arm64",
+            f"ruyi-{tag}.linux-riscv64",
+        ],
+    )
+    urls = _generate_download_urls(release, pm_repo)
+    assert urls == {
+        "linux/aarch64": [
+            f"https://github.com/foo/bar/releases/download/{tag}/ruyi-{tag}.linux-arm64",
+            f"https://mirror.iscas.ac.cn/ruyisdk/ruyi/tags/{tag}/ruyi-{tag}.linux-arm64",
+        ],
+        "linux/riscv64": [
+            f"https://github.com/foo/bar/releases/download/{tag}/ruyi-{tag}.linux-riscv64",
+            f"https://mirror.iscas.ac.cn/ruyisdk/ruyi/tags/{tag}/ruyi-{tag}.linux-riscv64",
+        ],
+        "linux/x86_64": [
+            f"https://github.com/foo/bar/releases/download/{tag}/ruyi-{tag}.linux-amd64",
+            f"https://mirror.iscas.ac.cn/ruyisdk/ruyi/tags/{tag}/ruyi-{tag}.linux-amd64",
+        ],
+    }
+
+
+def test_generate_download_urls_merges_old_and_new_naming() -> None:
+    # During the rename transition a release may carry both the old bare arch
+    # name and the new "linux-<arch>" name for the same platform. Both map to
+    # the same platform key, and their URLs must be merged rather than one set
+    # silently dropped.
+    pm_repo = "foo/bar"
+    tag = "0.61.0"
+    release = make_ide_release_stats(
+        tag,
+        "2026-10-01T00:00:00+00:00",
+        [
+            f"ruyi-{tag}.amd64",
+            f"ruyi-{tag}.linux-amd64",
+        ],
+    )
+    urls = _generate_download_urls(release, pm_repo)
+    assert urls == {
+        "linux/x86_64": [
+            f"https://github.com/foo/bar/releases/download/{tag}/ruyi-{tag}.amd64",
+            f"https://mirror.iscas.ac.cn/ruyisdk/ruyi/tags/{tag}/ruyi-{tag}.amd64",
+            f"https://github.com/foo/bar/releases/download/{tag}/ruyi-{tag}.linux-amd64",
+            f"https://mirror.iscas.ac.cn/ruyisdk/ruyi/tags/{tag}/ruyi-{tag}.linux-amd64",
+        ],
+    }
+
+
 def test_generate_ide_download_urls_vscode() -> None:
     ide_repo = "ruyisdk/ruyisdk-vscode-extension"
     ide_slug = "vscode"

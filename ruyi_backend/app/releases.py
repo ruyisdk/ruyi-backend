@@ -88,12 +88,18 @@ def _generate_download_urls(
 ) -> dict[str, list[str]]:
     """Generates download URLs for the given release."""
 
-    return {
-        _platform_key_for_asset_suffix(suffix): _download_urls_for_one_asset(
-            s["tag"], suffix, pm_repo
-        )
-        for suffix in get_supported_asset_suffixes(s)
-    }
+    # Several asset suffixes can map to the same platform key. This happens
+    # during naming transitions, e.g. when the old bare "amd64" and the new
+    # "linux-amd64" assets coexist for the same release. Merge their URLs under
+    # the shared key instead of letting one set clobber the other.
+    result: dict[str, list[str]] = {}
+    for suffix in get_supported_asset_suffixes(s):
+        key = _platform_key_for_asset_suffix(suffix)
+        urls = result.setdefault(key, [])
+        for url in _download_urls_for_one_asset(s["tag"], suffix, pm_repo):
+            if url not in urls:
+                urls.append(url)
+    return result
 
 
 def _get_ide_dl_mirrors(ide_repo: str, ide_slug: str) -> list[str]:
