@@ -150,6 +150,60 @@ def make_ide_release_stats(
     )
 
 
+def test_generate_download_urls_macos_arm64() -> None:
+    pm_repo = "foo/bar"
+    tag = "0.52.0-alpha.20260714"
+    release = make_ide_release_stats(
+        tag,
+        "2026-07-14T10:54:29+00:00",
+        [
+            f"ruyi-{tag}.tar.gz",
+            f"ruyi-{tag}.amd64",
+            f"ruyi-{tag}.arm64",
+            f"ruyi-{tag}.riscv64",
+            f"ruyi-{tag}.macos-arm64",
+        ],
+    )
+    urls = _generate_download_urls(release, pm_repo)
+    assert urls == {
+        "linux/aarch64": [
+            f"https://github.com/foo/bar/releases/download/{tag}/ruyi-{tag}.arm64",
+            f"https://mirror.iscas.ac.cn/ruyisdk/ruyi/tags/{tag}/ruyi-{tag}.arm64",
+        ],
+        "linux/riscv64": [
+            f"https://github.com/foo/bar/releases/download/{tag}/ruyi-{tag}.riscv64",
+            f"https://mirror.iscas.ac.cn/ruyisdk/ruyi/tags/{tag}/ruyi-{tag}.riscv64",
+        ],
+        "linux/x86_64": [
+            f"https://github.com/foo/bar/releases/download/{tag}/ruyi-{tag}.amd64",
+            f"https://mirror.iscas.ac.cn/ruyisdk/ruyi/tags/{tag}/ruyi-{tag}.amd64",
+        ],
+        "darwin/aarch64": [
+            f"https://github.com/foo/bar/releases/download/{tag}/ruyi-{tag}.macos-arm64",
+            f"https://mirror.iscas.ac.cn/ruyisdk/ruyi/tags/{tag}/ruyi-{tag}.macos-arm64",
+        ],
+    }
+
+
+def test_generate_download_urls_darwin_aarch64() -> None:
+    # macos-arm64 asset naming is expected to become darwin-aarch64 later; it
+    # must canonicalize to the same darwin/aarch64 platform key.
+    pm_repo = "foo/bar"
+    tag = "0.53.0"
+    release = make_ide_release_stats(
+        tag,
+        "2026-08-01T00:00:00+00:00",
+        [f"ruyi-{tag}.darwin-aarch64"],
+    )
+    urls = _generate_download_urls(release, pm_repo)
+    assert urls == {
+        "darwin/aarch64": [
+            f"https://github.com/foo/bar/releases/download/{tag}/ruyi-{tag}.darwin-aarch64",
+            f"https://mirror.iscas.ac.cn/ruyisdk/ruyi/tags/{tag}/ruyi-{tag}.darwin-aarch64",
+        ],
+    }
+
+
 def test_generate_ide_download_urls_vscode() -> None:
     ide_repo = "ruyisdk/ruyisdk-vscode-extension"
     ide_slug = "vscode"

@@ -1,5 +1,5 @@
 from collections.abc import Callable
-from typing import Final, cast
+from typing import cast
 
 from fastapi import APIRouter, Response
 import semver
@@ -14,38 +14,54 @@ from ..config.env import DIEnvConfig
 from ..components.github_stats import ReleaseDownloadStats
 from ..components.news_items import NEWS_ITEM_NOT_FOUND, get_news_item_markdown
 from ..schema.releases import LatestReleasesV1, ReleaseDetailV1
+from ..vendored_ruyi.ruyipkg_host import canonicalize_host_str
 
 router = APIRouter(prefix="/releases")
 
-ARCH_NAME_DL_TO_UNAME = {
-    "amd64": "x86_64",
-    "arm64": "aarch64",
+# Aliases for the OS segment of an asset filename suffix that the shared
+# canonicalization logic does not (yet) know about. The onefile distributions
+# for macOS are currently named "<version>.macos-arm64"; this naming is expected
+# to switch to "<version>.darwin-aarch64" later, so both must map to the same
+# canonical "darwin/aarch64" platform key.
+ASSET_SUFFIX_OS_ALIASES = {
+    "macos": "darwin",
 }
 
-ARCH_NAME_UNAME_TO_DL: Final = {v: k for k, v in ARCH_NAME_DL_TO_UNAME.items()}
+
+def _platform_key_for_asset_suffix(suffix: str) -> str:
+    """Canonicalizes an asset filename suffix into a "<os>/<arch>" platform key.
+
+    Bare arch suffixes (e.g. "amd64", "riscv64") imply Linux, while suffixes of
+    the form "<os>-<arch>" (e.g. "macos-arm64") encode a non-Linux OS.
+    """
+
+    os_frag, sep, arch_frag = suffix.partition("-")
+    if sep:
+        os_name = ASSET_SUFFIX_OS_ALIASES.get(os_frag, os_frag)
+        return canonicalize_host_str(f"{os_name}/{arch_frag}")
+    # bare arch; canonicalize_host_str defaults the OS to Linux
+    return canonicalize_host_str(suffix)
 
 
-def get_supported_arches(release_stat: ReleaseDownloadStats) -> list[str]:
-    """Returns the supported architectures for the given release."""
+def get_supported_asset_suffixes(release_stat: ReleaseDownloadStats) -> list[str]:
+    """Returns the platform suffixes of the onefile assets for the release."""
 
     # for now the release assets are named in the following manner:
     #
     # * source archive: ruyi-<version>.tar.gz
-    # * onefile distributions: ruyi-<version>.<arch>
+    # * onefile distributions: ruyi-<version>.<suffix>
     #
-    # with the <arch> currently coinciding with the Debian architecture names
-    # (e.g. amd64 instead of x86_64, arm64 instead of aarch64).
-    #
-    # we can figure out the supported arches for the release this way
-    arches = set()
+    # where <suffix> is either a bare Debian-style arch name (e.g. amd64,
+    # arm64, riscv64) implying Linux, or an "<os>-<arch>" pair for non-Linux
+    # targets (e.g. macos-arm64).
+    suffixes = set()
     for asset in release_stat["assets"]:
         name = asset["name"]
         if name.endswith(".tar.gz"):
             # source archive
             continue
-        arch_dl = name.rsplit(".", 1)[1]
-        arches.add(ARCH_NAME_DL_TO_UNAME.get(arch_dl, arch_dl))
-    return list(sorted(arches))
+        suffixes.add(name.rsplit(".", 1)[1])
+    return list(sorted(suffixes))
 
 
 def get_dl_mirrors(pm_repo: str) -> list[str]:
@@ -58,14 +74,12 @@ def get_dl_mirrors(pm_repo: str) -> list[str]:
     ]
 
 
-# Stub function for download URL generation
 def _download_urls_for_one_asset(
     ver: str,
-    arch: str,
+    suffix: str,
     pm_repo: str,
 ) -> list[str]:
-    arch_dl = ARCH_NAME_UNAME_TO_DL.get(arch, arch)
-    return [base + f"{ver}/ruyi-{ver}.{arch_dl}" for base in get_dl_mirrors(pm_repo)]
+    return [base + f"{ver}/ruyi-{ver}.{suffix}" for base in get_dl_mirrors(pm_repo)]
 
 
 def _generate_download_urls(
@@ -74,11 +88,11 @@ def _generate_download_urls(
 ) -> dict[str, list[str]]:
     """Generates download URLs for the given release."""
 
-    # FIXME: we currently only provide Linux binaries, so the "linux" part is hardcoded
-    # for now
     return {
-        f"linux/{arch}": _download_urls_for_one_asset(s["tag"], arch, pm_repo)
-        for arch in get_supported_arches(s)
+        _platform_key_for_asset_suffix(suffix): _download_urls_for_one_asset(
+            s["tag"], suffix, pm_repo
+        )
+        for suffix in get_supported_asset_suffixes(s)
     }
 
 
