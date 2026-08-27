@@ -1,6 +1,6 @@
 import datetime
 import json
-from typing import Any, List, cast
+from typing import Any, cast
 from unittest.mock import AsyncMock
 
 import msgpack
@@ -22,14 +22,14 @@ from .fixtures import RuyiFileFixtureFactory
 
 
 @pytest.fixture
-def release_stats(ruyi_file: RuyiFileFixtureFactory) -> List[ReleaseDownloadStats]:
+def release_stats(ruyi_file: RuyiFileFixtureFactory) -> list[ReleaseDownloadStats]:
     with ruyi_file.path("github-release-stats-cache.json") as p:
         with open(p, "r") as f:
-            return cast(List[ReleaseDownloadStats], json.load(f))
+            return cast(list[ReleaseDownloadStats], json.load(f))
 
 
-def test_get_latest_releases(release_stats: List[ReleaseDownloadStats]) -> None:
-    stats: List[ReleaseDownloadStats] = release_stats
+def test_get_latest_releases(release_stats: list[ReleaseDownloadStats]) -> None:
+    stats: list[ReleaseDownloadStats] = release_stats
     pm_repo = "foo/bar"
     result: LatestReleasesV1 = _get_latest_releases(
         stats, lambda s: _generate_download_urls(s, pm_repo)
@@ -150,6 +150,118 @@ def make_ide_release_stats(
     )
 
 
+def test_generate_download_urls_macos_arm64() -> None:
+    pm_repo = "foo/bar"
+    tag = "0.52.0-alpha.20260714"
+    release = make_ide_release_stats(
+        tag,
+        "2026-07-14T10:54:29+00:00",
+        [
+            f"ruyi-{tag}.tar.gz",
+            f"ruyi-{tag}.amd64",
+            f"ruyi-{tag}.arm64",
+            f"ruyi-{tag}.riscv64",
+            f"ruyi-{tag}.macos-arm64",
+        ],
+    )
+    urls = _generate_download_urls(release, pm_repo)
+    assert urls == {
+        "linux/aarch64": [
+            f"https://github.com/foo/bar/releases/download/{tag}/ruyi-{tag}.arm64",
+            f"https://mirror.iscas.ac.cn/ruyisdk/ruyi/tags/{tag}/ruyi-{tag}.arm64",
+        ],
+        "linux/riscv64": [
+            f"https://github.com/foo/bar/releases/download/{tag}/ruyi-{tag}.riscv64",
+            f"https://mirror.iscas.ac.cn/ruyisdk/ruyi/tags/{tag}/ruyi-{tag}.riscv64",
+        ],
+        "linux/x86_64": [
+            f"https://github.com/foo/bar/releases/download/{tag}/ruyi-{tag}.amd64",
+            f"https://mirror.iscas.ac.cn/ruyisdk/ruyi/tags/{tag}/ruyi-{tag}.amd64",
+        ],
+        "darwin/aarch64": [
+            f"https://github.com/foo/bar/releases/download/{tag}/ruyi-{tag}.macos-arm64",
+            f"https://mirror.iscas.ac.cn/ruyisdk/ruyi/tags/{tag}/ruyi-{tag}.macos-arm64",
+        ],
+    }
+
+
+def test_generate_download_urls_darwin_aarch64() -> None:
+    # macos-arm64 asset naming is expected to become darwin-aarch64 later; it
+    # must canonicalize to the same darwin/aarch64 platform key.
+    pm_repo = "foo/bar"
+    tag = "0.53.0"
+    release = make_ide_release_stats(
+        tag,
+        "2026-08-01T00:00:00+00:00",
+        [f"ruyi-{tag}.darwin-aarch64"],
+    )
+    urls = _generate_download_urls(release, pm_repo)
+    assert urls == {
+        "darwin/aarch64": [
+            f"https://github.com/foo/bar/releases/download/{tag}/ruyi-{tag}.darwin-aarch64",
+            f"https://mirror.iscas.ac.cn/ruyisdk/ruyi/tags/{tag}/ruyi-{tag}.darwin-aarch64",
+        ],
+    }
+
+
+def test_generate_download_urls_linux_prefixed_suffix() -> None:
+    # Linux onefile assets are expected to gain a "linux-" prefix later; the
+    # new naming must produce the same linux/<arch> platform keys.
+    pm_repo = "foo/bar"
+    tag = "0.60.0"
+    release = make_ide_release_stats(
+        tag,
+        "2026-09-01T00:00:00+00:00",
+        [
+            f"ruyi-{tag}.tar.gz",
+            f"ruyi-{tag}.linux-amd64",
+            f"ruyi-{tag}.linux-arm64",
+            f"ruyi-{tag}.linux-riscv64",
+        ],
+    )
+    urls = _generate_download_urls(release, pm_repo)
+    assert urls == {
+        "linux/aarch64": [
+            f"https://github.com/foo/bar/releases/download/{tag}/ruyi-{tag}.linux-arm64",
+            f"https://mirror.iscas.ac.cn/ruyisdk/ruyi/tags/{tag}/ruyi-{tag}.linux-arm64",
+        ],
+        "linux/riscv64": [
+            f"https://github.com/foo/bar/releases/download/{tag}/ruyi-{tag}.linux-riscv64",
+            f"https://mirror.iscas.ac.cn/ruyisdk/ruyi/tags/{tag}/ruyi-{tag}.linux-riscv64",
+        ],
+        "linux/x86_64": [
+            f"https://github.com/foo/bar/releases/download/{tag}/ruyi-{tag}.linux-amd64",
+            f"https://mirror.iscas.ac.cn/ruyisdk/ruyi/tags/{tag}/ruyi-{tag}.linux-amd64",
+        ],
+    }
+
+
+def test_generate_download_urls_merges_old_and_new_naming() -> None:
+    # During the rename transition a release may carry both the old bare arch
+    # name and the new "linux-<arch>" name for the same platform. Both map to
+    # the same platform key, and their URLs must be merged rather than one set
+    # silently dropped.
+    pm_repo = "foo/bar"
+    tag = "0.61.0"
+    release = make_ide_release_stats(
+        tag,
+        "2026-10-01T00:00:00+00:00",
+        [
+            f"ruyi-{tag}.amd64",
+            f"ruyi-{tag}.linux-amd64",
+        ],
+    )
+    urls = _generate_download_urls(release, pm_repo)
+    assert urls == {
+        "linux/x86_64": [
+            f"https://github.com/foo/bar/releases/download/{tag}/ruyi-{tag}.amd64",
+            f"https://mirror.iscas.ac.cn/ruyisdk/ruyi/tags/{tag}/ruyi-{tag}.amd64",
+            f"https://github.com/foo/bar/releases/download/{tag}/ruyi-{tag}.linux-amd64",
+            f"https://mirror.iscas.ac.cn/ruyisdk/ruyi/tags/{tag}/ruyi-{tag}.linux-amd64",
+        ],
+    }
+
+
 def test_generate_ide_download_urls_vscode() -> None:
     ide_repo = "ruyisdk/ruyisdk-vscode-extension"
     ide_slug = "vscode"
@@ -161,10 +273,8 @@ def test_generate_ide_download_urls_vscode() -> None:
     urls = _generate_ide_download_urls(release, ide_repo, ide_slug)
     assert urls == {
         "none/any": [
-            "https://github.com/ruyisdk/ruyisdk-vscode-extension/releases/download/"
-            "0.1.4/ruyisdk-vscode-extension-0.1.4.vsix",
-            "https://mirror.iscas.ac.cn/ruyisdk/ide/plugins/vscode/"
-            "ruyisdk-vscode-extension-0.1.4.vsix",
+            "https://github.com/ruyisdk/ruyisdk-vscode-extension/releases/download/0.1.4/ruyisdk-vscode-extension-0.1.4.vsix",
+            "https://mirror.iscas.ac.cn/ruyisdk/ide/plugins/vscode/ruyisdk-vscode-extension-0.1.4.vsix",
         ],
     }
 
@@ -180,10 +290,8 @@ def test_generate_ide_download_urls_eclipse() -> None:
     urls = _generate_ide_download_urls(release, ide_repo, ide_slug)
     assert urls == {
         "none/any": [
-            "https://github.com/ruyisdk/ruyisdk-eclipse-plugins/releases/download/"
-            "0.1.4/ruyisdk-eclipse-plugins-0.1.4.zip",
-            "https://mirror.iscas.ac.cn/ruyisdk/ide/plugins/eclipse/"
-            "ruyisdk-eclipse-plugins-0.1.4.zip",
+            "https://github.com/ruyisdk/ruyisdk-eclipse-plugins/releases/download/0.1.4/ruyisdk-eclipse-plugins-0.1.4.zip",
+            "https://mirror.iscas.ac.cn/ruyisdk/ide/plugins/eclipse/ruyisdk-eclipse-plugins-0.1.4.zip",
         ],
     }
 
@@ -202,14 +310,10 @@ def test_generate_ide_download_urls_multiple_assets() -> None:
     urls = _generate_ide_download_urls(release, ide_repo, ide_slug)
     assert urls == {
         "none/any": [
-            "https://github.com/ruyisdk/ruyisdk-vscode-extension/releases/download/"
-            "0.1.4/ruyisdk-vscode-extension-0.1.4.vsix",
-            "https://mirror.iscas.ac.cn/ruyisdk/ide/plugins/vscode/"
-            "ruyisdk-vscode-extension-0.1.4.vsix",
-            "https://github.com/ruyisdk/ruyisdk-vscode-extension/releases/download/"
-            "0.1.4/ruyisdk-vscode-extension-0.1.4.tar.gz",
-            "https://mirror.iscas.ac.cn/ruyisdk/ide/plugins/vscode/"
-            "ruyisdk-vscode-extension-0.1.4.tar.gz",
+            "https://github.com/ruyisdk/ruyisdk-vscode-extension/releases/download/0.1.4/ruyisdk-vscode-extension-0.1.4.vsix",
+            "https://mirror.iscas.ac.cn/ruyisdk/ide/plugins/vscode/ruyisdk-vscode-extension-0.1.4.vsix",
+            "https://github.com/ruyisdk/ruyisdk-vscode-extension/releases/download/0.1.4/ruyisdk-vscode-extension-0.1.4.tar.gz",
+            "https://mirror.iscas.ac.cn/ruyisdk/ide/plugins/vscode/ruyisdk-vscode-extension-0.1.4.tar.gz",
         ],
     }
 
@@ -245,10 +349,8 @@ def test_get_latest_ide_releases() -> None:
     assert stable.channel == "stable"
     assert stable.download_urls == {
         "none/any": [
-            "https://github.com/ruyisdk/ruyisdk-vscode-extension/releases/download/"
-            "0.1.4/ruyisdk-vscode-extension-0.1.4.vsix",
-            "https://mirror.iscas.ac.cn/ruyisdk/ide/plugins/vscode/"
-            "ruyisdk-vscode-extension-0.1.4.vsix",
+            "https://github.com/ruyisdk/ruyisdk-vscode-extension/releases/download/0.1.4/ruyisdk-vscode-extension-0.1.4.vsix",
+            "https://mirror.iscas.ac.cn/ruyisdk/ide/plugins/vscode/ruyisdk-vscode-extension-0.1.4.vsix",
         ],
     }
 
@@ -257,10 +359,8 @@ def test_get_latest_ide_releases() -> None:
     assert testing.channel == "testing"
     assert testing.download_urls == {
         "none/any": [
-            "https://github.com/ruyisdk/ruyisdk-vscode-extension/releases/download/"
-            "0.1.4-beta.1/ruyisdk-vscode-extension-0.1.4-beta.1.vsix",
-            "https://mirror.iscas.ac.cn/ruyisdk/ide/plugins/vscode/"
-            "ruyisdk-vscode-extension-0.1.4-beta.1.vsix",
+            "https://github.com/ruyisdk/ruyisdk-vscode-extension/releases/download/0.1.4-beta.1/ruyisdk-vscode-extension-0.1.4-beta.1.vsix",
+            "https://mirror.iscas.ac.cn/ruyisdk/ide/plugins/vscode/ruyisdk-vscode-extension-0.1.4-beta.1.vsix",
         ],
     }
 
@@ -304,8 +404,6 @@ def test_latest_eclipse_with_v_prefixed_tags() -> None:
     assert stable.version == "0.1.4"
     assert stable.channel == "stable"
     assert stable.download_urls["none/any"] == [
-        "https://github.com/ruyisdk/ruyisdk-eclipse-plugins/releases/download/"
-        "v0.1.4/ruyisdk-eclipse-plugins-0.1.4.zip",
-        "https://mirror.iscas.ac.cn/ruyisdk/ide/plugins/eclipse/"
-        "ruyisdk-eclipse-plugins-0.1.4.zip",
+        "https://github.com/ruyisdk/ruyisdk-eclipse-plugins/releases/download/v0.1.4/ruyisdk-eclipse-plugins-0.1.4.zip",
+        "https://mirror.iscas.ac.cn/ruyisdk/ide/plugins/eclipse/ruyisdk-eclipse-plugins-0.1.4.zip",
     ]

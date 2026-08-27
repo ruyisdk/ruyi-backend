@@ -52,5 +52,3 @@ async def telemetry_pm_upload_v1(payload: UploadPayload, main_db: DIMainDB) -> N
         )
 
         await conn.commit()
-
-    return None

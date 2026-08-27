@@ -55,7 +55,12 @@ class FakeCache:
 async def test_dashboard_counts_distinct_installation_report_uuids() -> None:
     db = FakeDB()
 
-    result = await crunch_and_cache_dashboard_numbers(db, FakeES(), FakeCache())
+    result = await crunch_and_cache_dashboard_numbers(
+        db,
+        FakeES(),
+        FakeCache(),
+        datetime.UTC,
+    )
 
     assert result.installs is not None
     assert result.installs.total == 7

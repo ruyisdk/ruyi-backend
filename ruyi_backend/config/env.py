@@ -4,6 +4,7 @@ from typing import Annotated, Any, TypeAlias
 from fastapi import Depends
 from pydantic import BaseModel
 from pydantic_settings import BaseSettings, SettingsConfigDict
+import pytz
 
 from . import defaults
 
@@ -120,6 +121,12 @@ class EnvConfig(BaseSettings, case_sensitive=False):
         nested_model_default_partial_update=True,
     )
     debug: bool = False
+    ref_timezone: str = "UTC"
+
+    @functools.cached_property
+    def ref_tz(self) -> pytz.BaseTzInfo:
+        return pytz.timezone(self.ref_timezone)
+
     auth: AuthConfig = AuthConfig()
     cache_main: RedisConfig = RedisConfig()
     cli: CLIConfig = CLIConfig()

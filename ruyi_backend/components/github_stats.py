@@ -187,7 +187,7 @@ async def _list_repo_contributors(
     async with debug_lock:
         print(f"{owner}/{repo}: successfully fetched {len(result)} contributor(s)")
 
-    return list(sorted(result))
+    return sorted(result)
 
 
 async def _list_org_members(
@@ -213,7 +213,7 @@ async def _list_org_members(
             page += 1
             continue
         break
-    return list(sorted(result))
+    return sorted(result)
 
 
 async def _list_org_outside_collaborators(
@@ -243,7 +243,7 @@ async def _list_org_outside_collaborators(
             page += 1
             continue
         break
-    return list(sorted(result))
+    return sorted(result)
 
 
 async def query_org_stats(

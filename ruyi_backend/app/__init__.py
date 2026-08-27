@@ -1,3 +1,4 @@
+# this ordering is required to avoid circular import issues
 from .root import app as app
 
 # register the various API endpoints
