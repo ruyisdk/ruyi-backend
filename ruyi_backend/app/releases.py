@@ -61,7 +61,7 @@ def get_supported_asset_suffixes(release_stat: ReleaseDownloadStats) -> list[str
             # source archive
             continue
         suffixes.add(name.rsplit(".", 1)[1])
-    return list(sorted(suffixes))
+    return sorted(suffixes)
 
 
 def get_dl_mirrors(pm_repo: str) -> list[str]:
