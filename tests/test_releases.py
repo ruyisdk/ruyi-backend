@@ -1,6 +1,6 @@
 import datetime
 import json
-from typing import Any, List, cast
+from typing import Any, cast
 from unittest.mock import AsyncMock
 
 import msgpack
@@ -22,14 +22,14 @@ from .fixtures import RuyiFileFixtureFactory
 
 
 @pytest.fixture
-def release_stats(ruyi_file: RuyiFileFixtureFactory) -> List[ReleaseDownloadStats]:
+def release_stats(ruyi_file: RuyiFileFixtureFactory) -> list[ReleaseDownloadStats]:
     with ruyi_file.path("github-release-stats-cache.json") as p:
         with open(p, "r") as f:
-            return cast(List[ReleaseDownloadStats], json.load(f))
+            return cast(list[ReleaseDownloadStats], json.load(f))
 
 
-def test_get_latest_releases(release_stats: List[ReleaseDownloadStats]) -> None:
-    stats: List[ReleaseDownloadStats] = release_stats
+def test_get_latest_releases(release_stats: list[ReleaseDownloadStats]) -> None:
+    stats: list[ReleaseDownloadStats] = release_stats
     pm_repo = "foo/bar"
     result: LatestReleasesV1 = _get_latest_releases(
         stats, lambda s: _generate_download_urls(s, pm_repo)
