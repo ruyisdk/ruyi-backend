@@ -69,7 +69,7 @@ async def _query_overall(package_name: str) -> list[PyPIStatsDataPoint]:
 
 async def fetch_pypi_download_stats(
     package_name: str,
-) -> dict[datetime.date, int]:
+) -> dict[datetime.datetime, int]:
     """Fetches the download stats for a given PyPI package.
 
     Returns a dictionary containing daily download stats keyed by date.
@@ -78,7 +78,8 @@ async def fetch_pypi_download_stats(
     stats = await _query_overall(package_name)
     result = {}
     for p in stats:
-        dt = datetime.datetime.strptime(p["date"], "%Y-%m-%d").date()
+        y, m, d = map(int, p["date"].split("-"))
+        dt = datetime.datetime(y, m, d, tzinfo=datetime.UTC)
         result[dt] = p["downloads"]
 
     return result
@@ -87,7 +88,7 @@ async def fetch_pypi_download_stats(
 async def persist_pypi_download_stats(
     conn: AsyncConnection,
     package_name: str,
-    stats: dict[datetime.date, int],
+    stats: dict[datetime.datetime, int],
 ) -> None:
     """Persists the given PyPI download stats into the database.
 
@@ -95,12 +96,12 @@ async def persist_pypi_download_stats(
     """
 
     buf: list[ModelDownloadStatsDailyPyPI] = []
-    for date, count in stats.items():
+    for dt, count in stats.items():
         buf.append(
             ModelDownloadStatsDailyPyPI(
                 name=package_name,
                 version="*",
-                date=datetime.datetime(date.year, date.month, date.day),
+                date=dt,
                 count=count,
             ),
         )
