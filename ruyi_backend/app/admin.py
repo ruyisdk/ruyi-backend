@@ -150,7 +150,8 @@ async def admin_refresh_pypi_stats(
         new_total = await sum_pypi_download_stats(
             conn,
             date_start=datetime.date(2025, 7, 30),  # our PyPI launch date - 1
-            date_end=datetime.date.today() + datetime.timedelta(days=1),
+            date_end=datetime.datetime.now(tz=cfg.ref_tz).date()
+            + datetime.timedelta(days=1),
             package_name=pkg,
         )
 
