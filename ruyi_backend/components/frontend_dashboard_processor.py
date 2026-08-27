@@ -4,6 +4,7 @@ import sys
 import traceback
 from typing import cast
 
+import pytz
 from elasticsearch import AsyncElasticsearch
 from pydantic import ValidationError
 from sqlalchemy.ext.asyncio import AsyncConnection
@@ -40,6 +41,7 @@ async def crunch_and_cache_dashboard_numbers(
     db: AsyncConnection,
     es: AsyncElasticsearch,
     cache: CacheStore,
+    tz: pytz.BaseTzInfo,
 ) -> DashboardDataV1:
     """
     Ingests the semi-processed telemetry events to produce statistics for the
@@ -53,7 +55,7 @@ async def crunch_and_cache_dashboard_numbers(
             raise ValueError()
     except Exception:
         # graceful degrade to something sensible
-        last_updated = datetime.datetime.now(datetime.timezone.utc)
+        last_updated = datetime.datetime.now(tz)
 
     gh_org_stats: list[DashboardGitHubOrgStatsV1] = []
     if cached_gh_org_stats_ruyisdk := await cache.get(KEY_GITHUB_ORG_STATS_RUYISDK):
@@ -86,7 +88,7 @@ async def crunch_and_cache_dashboard_numbers(
     pm_pypi_downloads = await cache.get(KEY_PYPI_DOWNLOAD_TOTAL_PM) or 0
 
     # query download counts from ES
-    now = datetime.datetime.now(tz=datetime.timezone.utc)
+    now = datetime.datetime.now(tz=tz)
 
     async def query_es_count(path: str) -> int:
         print(f"querying request counts for path {path} from ES")
@@ -98,7 +100,18 @@ async def crunch_and_cache_dashboard_numbers(
                         {
                             "range": {
                                 "@timestamp": {
-                                    "gte": "2025-01-01T00:00:00+08:00",
+                                    "gte": datetime.datetime(
+                                        2024,
+                                        12,
+                                        31,
+                                        16,
+                                        0,
+                                        0,
+                                        0,
+                                        tzinfo=datetime.UTC,
+                                    )
+                                    .astimezone(tz)
+                                    .isoformat(),  # "2025-01-01T00:00:00+08:00"
                                     "lt": now.isoformat(),
                                 }
                             }

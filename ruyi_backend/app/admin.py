@@ -38,6 +38,7 @@ router = APIRouter(prefix="/admin")
 
 @router.post("/process-telemetry-v1", status_code=204)
 async def admin_process_telemetry(
+    cfg: DIEnvConfig,
     req: ReqProcessTelemetry,
     main_db: DIMainDB,
     es: DIMainES,
@@ -79,13 +80,13 @@ async def admin_process_telemetry(
             # Commit the transaction
             await txn.commit()
 
-    last_processed = datetime.datetime.now(datetime.timezone.utc)
+    last_processed = datetime.datetime.now(tz=cfg.ref_tz)
     await cache.set(KEY_TELEMETRY_DATA_LAST_PROCESSED, last_processed)
 
     # refresh frontend dashboard numbers
     try:
         async with main_db.connect() as conn:
-            await crunch_and_cache_dashboard_numbers(conn, es, cache)
+            await crunch_and_cache_dashboard_numbers(conn, es, cache, cfg.ref_tz)
     except Exception as e:
         # ignore cache errors
         traceback.print_exception(e, file=sys.stderr)
@@ -124,7 +125,7 @@ async def admin_refresh_github_stats(
     # refresh frontend dashboard numbers
     try:
         async with db.connect() as conn:
-            await crunch_and_cache_dashboard_numbers(conn, es, cache)
+            await crunch_and_cache_dashboard_numbers(conn, es, cache, cfg.ref_tz)
     except Exception as e:
         # ignore cache errors
         traceback.print_exception(e, file=sys.stderr)
@@ -162,7 +163,7 @@ async def admin_refresh_pypi_stats(
     # refresh frontend dashboard numbers
     try:
         async with db.connect() as conn:
-            await crunch_and_cache_dashboard_numbers(conn, es, cache)
+            await crunch_and_cache_dashboard_numbers(conn, es, cache, cfg.ref_tz)
     except Exception as e:
         # ignore cache errors
         traceback.print_exception(e, file=sys.stderr)
