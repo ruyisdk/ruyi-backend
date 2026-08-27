@@ -137,7 +137,7 @@ def _get_latest_releases(
     latest_versions_by_channel: dict[str, semver.Version] = {}
     for rel in stats:
         tag = rel["tag"]
-        semver_str = tag[1:] if tag.startswith("v") else tag
+        semver_str = tag.removeprefix("v")
         try:
             v = semver.Version.parse(semver_str)
         except ValueError:
