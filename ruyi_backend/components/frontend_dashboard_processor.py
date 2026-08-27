@@ -159,7 +159,7 @@ async def crunch_and_cache_dashboard_numbers(
     other_categories = categories.copy()
     keys_to_remove = []
     for k in other_categories:
-        if k.startswith("pm:") or k.startswith("ide:") or k == "pkg":
+        if k.startswith(("pm:", "ide:")) or k == "pkg":
             keys_to_remove.append(k)
     for k in keys_to_remove:
         del other_categories[k]
