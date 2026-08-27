@@ -273,10 +273,8 @@ def test_generate_ide_download_urls_vscode() -> None:
     urls = _generate_ide_download_urls(release, ide_repo, ide_slug)
     assert urls == {
         "none/any": [
-            "https://github.com/ruyisdk/ruyisdk-vscode-extension/releases/download/"
-            "0.1.4/ruyisdk-vscode-extension-0.1.4.vsix",
-            "https://mirror.iscas.ac.cn/ruyisdk/ide/plugins/vscode/"
-            "ruyisdk-vscode-extension-0.1.4.vsix",
+            "https://github.com/ruyisdk/ruyisdk-vscode-extension/releases/download/0.1.4/ruyisdk-vscode-extension-0.1.4.vsix",
+            "https://mirror.iscas.ac.cn/ruyisdk/ide/plugins/vscode/ruyisdk-vscode-extension-0.1.4.vsix",
         ],
     }
 
@@ -292,10 +290,8 @@ def test_generate_ide_download_urls_eclipse() -> None:
     urls = _generate_ide_download_urls(release, ide_repo, ide_slug)
     assert urls == {
         "none/any": [
-            "https://github.com/ruyisdk/ruyisdk-eclipse-plugins/releases/download/"
-            "0.1.4/ruyisdk-eclipse-plugins-0.1.4.zip",
-            "https://mirror.iscas.ac.cn/ruyisdk/ide/plugins/eclipse/"
-            "ruyisdk-eclipse-plugins-0.1.4.zip",
+            "https://github.com/ruyisdk/ruyisdk-eclipse-plugins/releases/download/0.1.4/ruyisdk-eclipse-plugins-0.1.4.zip",
+            "https://mirror.iscas.ac.cn/ruyisdk/ide/plugins/eclipse/ruyisdk-eclipse-plugins-0.1.4.zip",
         ],
     }
 
@@ -314,14 +310,10 @@ def test_generate_ide_download_urls_multiple_assets() -> None:
     urls = _generate_ide_download_urls(release, ide_repo, ide_slug)
     assert urls == {
         "none/any": [
-            "https://github.com/ruyisdk/ruyisdk-vscode-extension/releases/download/"
-            "0.1.4/ruyisdk-vscode-extension-0.1.4.vsix",
-            "https://mirror.iscas.ac.cn/ruyisdk/ide/plugins/vscode/"
-            "ruyisdk-vscode-extension-0.1.4.vsix",
-            "https://github.com/ruyisdk/ruyisdk-vscode-extension/releases/download/"
-            "0.1.4/ruyisdk-vscode-extension-0.1.4.tar.gz",
-            "https://mirror.iscas.ac.cn/ruyisdk/ide/plugins/vscode/"
-            "ruyisdk-vscode-extension-0.1.4.tar.gz",
+            "https://github.com/ruyisdk/ruyisdk-vscode-extension/releases/download/0.1.4/ruyisdk-vscode-extension-0.1.4.vsix",
+            "https://mirror.iscas.ac.cn/ruyisdk/ide/plugins/vscode/ruyisdk-vscode-extension-0.1.4.vsix",
+            "https://github.com/ruyisdk/ruyisdk-vscode-extension/releases/download/0.1.4/ruyisdk-vscode-extension-0.1.4.tar.gz",
+            "https://mirror.iscas.ac.cn/ruyisdk/ide/plugins/vscode/ruyisdk-vscode-extension-0.1.4.tar.gz",
         ],
     }
 
@@ -357,10 +349,8 @@ def test_get_latest_ide_releases() -> None:
     assert stable.channel == "stable"
     assert stable.download_urls == {
         "none/any": [
-            "https://github.com/ruyisdk/ruyisdk-vscode-extension/releases/download/"
-            "0.1.4/ruyisdk-vscode-extension-0.1.4.vsix",
-            "https://mirror.iscas.ac.cn/ruyisdk/ide/plugins/vscode/"
-            "ruyisdk-vscode-extension-0.1.4.vsix",
+            "https://github.com/ruyisdk/ruyisdk-vscode-extension/releases/download/0.1.4/ruyisdk-vscode-extension-0.1.4.vsix",
+            "https://mirror.iscas.ac.cn/ruyisdk/ide/plugins/vscode/ruyisdk-vscode-extension-0.1.4.vsix",
         ],
     }
 
@@ -369,10 +359,8 @@ def test_get_latest_ide_releases() -> None:
     assert testing.channel == "testing"
     assert testing.download_urls == {
         "none/any": [
-            "https://github.com/ruyisdk/ruyisdk-vscode-extension/releases/download/"
-            "0.1.4-beta.1/ruyisdk-vscode-extension-0.1.4-beta.1.vsix",
-            "https://mirror.iscas.ac.cn/ruyisdk/ide/plugins/vscode/"
-            "ruyisdk-vscode-extension-0.1.4-beta.1.vsix",
+            "https://github.com/ruyisdk/ruyisdk-vscode-extension/releases/download/0.1.4-beta.1/ruyisdk-vscode-extension-0.1.4-beta.1.vsix",
+            "https://mirror.iscas.ac.cn/ruyisdk/ide/plugins/vscode/ruyisdk-vscode-extension-0.1.4-beta.1.vsix",
         ],
     }
 
@@ -416,8 +404,6 @@ def test_latest_eclipse_with_v_prefixed_tags() -> None:
     assert stable.version == "0.1.4"
     assert stable.channel == "stable"
     assert stable.download_urls["none/any"] == [
-        "https://github.com/ruyisdk/ruyisdk-eclipse-plugins/releases/download/"
-        "v0.1.4/ruyisdk-eclipse-plugins-0.1.4.zip",
-        "https://mirror.iscas.ac.cn/ruyisdk/ide/plugins/eclipse/"
-        "ruyisdk-eclipse-plugins-0.1.4.zip",
+        "https://github.com/ruyisdk/ruyisdk-eclipse-plugins/releases/download/v0.1.4/ruyisdk-eclipse-plugins-0.1.4.zip",
+        "https://mirror.iscas.ac.cn/ruyisdk/ide/plugins/eclipse/ruyisdk-eclipse-plugins-0.1.4.zip",
     ]
