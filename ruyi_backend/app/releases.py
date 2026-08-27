@@ -144,8 +144,10 @@ def _get_latest_releases(
             continue
         channel = "testing" if v.prerelease else "stable"
         try:
-            if v > latest_versions_by_channel[channel]:
-                latest_versions_by_channel[channel] = v
+            latest_versions_by_channel[channel] = max(
+                latest_versions_by_channel[channel],
+                v,
+            )
         except KeyError:
             latest_versions_by_channel[channel] = v
 
