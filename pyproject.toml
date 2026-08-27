@@ -89,3 +89,22 @@ safe_licenses = [
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+
+
+[tool.ruff.lint]
+ignore = [
+  "BLE001",  # catch-alls are needed sometimes
+  "SIM102",  # merging walrus and normal if's can be weird?
+  "SIM103",  # sometimes "if not ...: return False; return True" are the streamlined form
+
+  # ignore some prevalent lints that were silent in ruff < 0.16, for gradual
+  # migration
+  "DTZ001",  # datetime
+  "DTZ005",
+  "I001",  # import ordering
+  "SIM117",  # nested with statements
+  "TRY004",  # prefer TypeError for type errors
+  "UP017",  # datetime.UTC
+  "UP035",  # collections.abc instead of typing
+  "UP040",  # type = instead of TypeAlias (Python 3.12+)
+]

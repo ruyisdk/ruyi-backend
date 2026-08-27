@@ -1,5 +1,5 @@
 # this ordering is required to avoid circular import issues
-from .root import app as app  # noqa: I001
+from .root import app as app
 
 # register the various API endpoints
 from . import admin as admin
