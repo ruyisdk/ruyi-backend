@@ -1,7 +1,7 @@
 import json
 from collections.abc import Iterator
 from types import TracebackType
-from typing import Any
+from typing import Any, Self
 
 import pytest
 from fastapi.testclient import TestClient
@@ -49,7 +49,7 @@ class FakeConnection:
         self.executions: list[tuple[str, dict[str, Any]]] = []
         self.committed = False
 
-    async def __aenter__(self) -> "FakeConnection":
+    async def __aenter__(self) -> Self:
         return self
 
     async def __aexit__(
