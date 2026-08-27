@@ -54,7 +54,7 @@ async def admin_process_telemetry(
             ).where(
                 telemetry_raw_uploads.c.created_at >= req.time_start,
                 telemetry_raw_uploads.c.created_at < req.time_end,
-                telemetry_raw_uploads.c.is_processed == False,  # noqa: E712  # DSL usage
+                telemetry_raw_uploads.c.is_processed == False,  # DSL usage
             )
             raw_events: list[ModelTelemetryRawUpload] = []
             upload_ids: list[int] = []
