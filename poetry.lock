@@ -1055,28 +1055,71 @@ files = [
 
 [[package]]
 name = "githubkit"
-version = "0.15.5"
+version = "0.16.1"
 description = "GitHub SDK for Python"
 optional = false
-python-versions = "<4.0,>=3.9"
+python-versions = "<4.0,>=3.10"
 groups = ["main"]
 files = [
-    {file = "githubkit-0.15.5-py3-none-any.whl", hash = "sha256:69934fdce7e4f197f24d85ea91d808ef245f4463bb982e4c19ac32d827bc7a40"},
-    {file = "githubkit-0.15.5.tar.gz", hash = "sha256:5ee487b77d3f4332c73fe5dbc69f932d8012ff0bb1aa9c544c238aef74ef1ae0"},
+    {file = "githubkit-0.16.1-py3-none-any.whl", hash = "sha256:a791e0eb57ec80824a711321376c5816aa1cd204e6982e4ad5ddce6c87490863"},
+    {file = "githubkit-0.16.1.tar.gz", hash = "sha256:f56ea4e796f169773d114c7f39089790f99443f1d05871d594d6bdca7928945c"},
 ]
 
 [package.dependencies]
 anyio = ">=3.6.1,<5.0.0"
-hishel = ">=0.0.21,<=0.2.0"
+githubkit-schemas = ">=26.5.7"
+hishel = {version = ">=1.3.0,<=2.0.0", extras = ["async", "httpx"]}
 httpx = ">=0.23.0,<1.0.0"
 pydantic = ">=1.9.1,!=2.5.0,!=2.5.1,<3.0.0"
 typing-extensions = ">=4.11.0,<5.0.0"
 
 [package.extras]
-all = ["pyjwt[crypto] (>=2.4.0,<3.0.0)"]
+all = ["githubkit-schemas[all] (>=26.5.7)", "pyjwt[crypto] (>=2.4.0,<3.0.0)"]
+all-schemas = ["githubkit-schemas[all] (>=26.5.7)"]
 auth = ["pyjwt[crypto] (>=2.4.0,<3.0.0)"]
 auth-app = ["pyjwt[crypto] (>=2.4.0,<3.0.0)"]
 jwt = ["pyjwt[crypto] (>=2.4.0,<3.0.0)"]
+
+[[package]]
+name = "githubkit-schemas"
+version = "26.11.19"
+description = "GitHub Schemas for GitHubKit"
+optional = false
+python-versions = "<4.0,>=3.10"
+groups = ["main"]
+files = [
+    {file = "githubkit_schemas-26.11.19-py3-none-any.whl", hash = "sha256:9d0630a2c18640b90477343422aaa737e703e82156dc9ca4c885e8341fd12281"},
+    {file = "githubkit_schemas-26.11.19.tar.gz", hash = "sha256:8bf3bb6a372df9bd9a6d8af8378c8ef4a03a52ecab16c557a42f7c372d2cac12"},
+]
+
+[package.dependencies]
+githubkit = ">=0.16.0"
+githubkit-schemas-2026-03-10 = "26.11.19"
+
+[package.extras]
+2022-11-28 = ["githubkit-schemas-2022-11-28 (==26.11.19)"]
+2026-03-10 = ["githubkit-schemas-2026-03-10 (==26.11.19)"]
+all = ["githubkit-schemas-2022-11-28 (==26.11.19)", "githubkit-schemas-2026-03-10 (==26.11.19)", "githubkit-schemas-ghec-2022-11-28 (==26.11.19)", "githubkit-schemas-ghec-2026-03-10 (==26.11.19)"]
+all-gh = ["githubkit-schemas-2022-11-28 (==26.11.19)", "githubkit-schemas-2026-03-10 (==26.11.19)"]
+all-ghec = ["githubkit-schemas-ghec-2022-11-28 (==26.11.19)", "githubkit-schemas-ghec-2026-03-10 (==26.11.19)"]
+ghec = ["githubkit-schemas-ghec-2026-03-10 (==26.11.19)"]
+ghec-2022-11-28 = ["githubkit-schemas-ghec-2022-11-28 (==26.11.19)"]
+ghec-2026-03-10 = ["githubkit-schemas-ghec-2026-03-10 (==26.11.19)"]
+
+[[package]]
+name = "githubkit-schemas-2026-03-10"
+version = "26.11.19"
+description = "GitHub Schemas for GitHubKit"
+optional = false
+python-versions = "<4.0,>=3.10"
+groups = ["main"]
+files = [
+    {file = "githubkit_schemas_2026_03_10-26.11.19-py3-none-any.whl", hash = "sha256:328397e81806a0cde7c0e44e1a131ea5db67223635098afb71aff5024a1e3cb3"},
+    {file = "githubkit_schemas_2026_03_10-26.11.19.tar.gz", hash = "sha256:ab9c12a34006b330901d8d139cfcf2ea8827d3c5f018627b4f59cc248c0ddf0b"},
+]
+
+[package.dependencies]
+githubkit-schemas = "26.11.19"
 
 [[package]]
 name = "googleapis-common-protos"
@@ -1341,30 +1384,30 @@ files = [
 
 [[package]]
 name = "hishel"
-version = "0.1.5"
-description = "Persistent cache implementation for httpx and httpcore"
+version = "1.4.0"
+description = "Elegant HTTP Caching for Python"
 optional = false
-python-versions = ">=3.9"
+python-versions = ">=3.10"
 groups = ["main"]
 files = [
-    {file = "hishel-0.1.5-py3-none-any.whl", hash = "sha256:0bfbe9a2b9342090eba82ba6de88258092e1c4c7b730cd4cb4b570e4b40e44a7"},
-    {file = "hishel-0.1.5.tar.gz", hash = "sha256:9d40c682cd94fd6e1394fb05713ae20a75ed8aeba6f5272380444039ce6257f2"},
+    {file = "hishel-1.4.0-py3-none-any.whl", hash = "sha256:38cb62d7d38fb437dc086f789c26d0cab41310d12497ec3f56dcead4b08571f0"},
+    {file = "hishel-1.4.0.tar.gz", hash = "sha256:e406b052c658ce28629fc31423b9914b637d47d7c923f5fe9e288ec47e4823d1"},
 ]
 
 [package.dependencies]
-anyio = ">=4.9.0"
-anysqlite = ">=0.0.5"
-httpx = ">=0.28.0"
+anyio = {version = ">=4.9.0", optional = true, markers = "extra == \"async\" or extra == \"httpx\""}
+anysqlite = {version = ">=0.0.5", optional = true, markers = "extra == \"async\" or extra == \"httpx\""}
+httpx = {version = ">=0.28.1", optional = true, markers = "extra == \"httpx\""}
 msgpack = ">=1.1.2"
 typing-extensions = ">=4.14.1"
 
 [package.extras]
-httpx = ["httpx (>=0.28.1)"]
-redis = ["redis (==6.2.0)"]
+async = ["anyio (>=4.9.0)", "anysqlite (>=0.0.5)"]
+fastapi = ["fastapi (>=0.119.1)"]
+httpx = ["anyio (>=4.9.0)", "anysqlite (>=0.0.5)", "httpx (>=0.28.1)"]
+httpx2 = ["anyio (>=4.9.0)", "anysqlite (>=0.0.5)", "httpx2 (>=2.9.1)"]
+redis = ["redis (>=7.0.0)"]
 requests = ["requests (>=2.32.5)"]
-s3 = ["boto3 (>=1.15.0,<=1.15.3) ; python_version < \"3.12\"", "boto3 (>=1.15.3) ; python_version >= \"3.12\""]
-sqlite = ["anysqlite (>=0.0.5)"]
-yaml = ["pyyaml (==6.0.2)"]
 
 [[package]]
 name = "httpcore"
@@ -3951,4 +3994,4 @@ propcache = ">=0.2.1"
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.12,<4"
-content-hash = "a8a355b8419dfaca05c2ca7fd1a2abf10dbd1f9dd91f2b9397bccecebd54f342"
+content-hash = "e47076f161a1e819612814c847b6b5ffa809eab55c133f810c3839a12ff969f8"
